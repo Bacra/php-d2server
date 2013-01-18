@@ -1,0 +1,9 @@
+# 将 RewriteEngine 模式打开
+RewriteEngine On
+
+RewriteBase /
+
+RewriteRule ^(.*[^\.])/api$ /.project/api.php [L]
+RewriteRule ^(.*[^\.]+\.html)(-4-(\w*))?$ /.project/convert.php?file=$1&part=$3 [L]
+RewriteRule ^(.*[^\.])/config$ /.project/api.php?type=config&dir=$1 [L]
+RewriteRule ^.*\.m(\d+)\.(\w+)$ /.project/source.php?pathid=$1 [L]
