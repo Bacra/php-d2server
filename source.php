@@ -3,12 +3,12 @@ require dirname(__FILE__).'/common.inc.php';
 
 // require './common.inc.php';
 
-// è·å–æ–‡ä»¶ç±»å‹ å¹¶è®¾ç½®ç¼–ç 
+// »ñÈ¡ÎÄ¼şÀàĞÍ ²¢ÉèÖÃ±àÂë
 $charset = isset($_GET['charset']) ? strtolower($_GET['charset']) : 'utf-8';
 
-// è®¾ç½®æ•°æ®ç±»å‹
-$pathinfo = pathinfo($_SERVER["REDIRECT_URL"]);
-$extension = isset($_GET['extension']) ? $_GET['extension'] : $pathinfo['extension'];
+// ÉèÖÃÊı¾İÀàĞÍ
+$extension = isset($_GET['extension']) ? $_GET['extension'] : 'js';
+
 switch ($extension) {
 	case 'js':
 		$type = 'text/javascript';
@@ -31,8 +31,6 @@ switch ($extension) {
 header("Content-Type:$type;charset=$charset");
 
 
-
-
 define('HTMLPATH', isset($_COOKIE[COOKIENAME4HTMLPATH]) ? $_COOKIE[COOKIENAME4HTMLPATH] : DOMAINROOT);
 define('PARAMFILE', HTMLPATH.PARAMPATH);
 
@@ -43,21 +41,21 @@ if (file_exists(PARAMFILE)) {
 	if (isset($_GET['pathid']) && isset($_paramconfig['files'][$_GET['pathid']])) {
 
 		/******************************
-			è¯»å–ç›¸åº”çš„èµ„æºæ–‡ä»¶
-			ä¾¿äºç›®å½•çš„ä¼ªé™æ€å¤„ç†
+			¶ÁÈ¡ÏàÓ¦µÄ×ÊÔ´ÎÄ¼ş
+			±ãÓÚÄ¿Â¼µÄÎ±¾²Ì¬´¦Àí
 		 ******************************/
 
 		header( 'Expires: -1' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
-		header( 'Pragma: no-cache' ); //å…¼å®¹http1.0å’Œhttps
+		header( 'Pragma: no-cache' ); //¼æÈİhttp1.0ºÍhttps
 
 
 		$dealFiles = $_paramconfig['files'][$_GET['pathid']];
 
 
-		// è¯»å–æ–‡ä»¶å†…å®¹
+		// ¶ÁÈ¡ÎÄ¼şÄÚÈİ
 
 		$filePathArr = array();
 		$fileContent = '';
@@ -68,7 +66,7 @@ if (file_exists(PARAMFILE)) {
 				loadFile($file, $fileContent, $filePathArr, $errorFileArr, true);
 			}
 
-			// è¾“å‡ºå¤´éƒ¨ä¿¡æ¯
+			// Êä³öÍ·²¿ĞÅÏ¢
 			echo "/**********************************\n\n".
 				"	Now: ".date('l dS \of F Y h:i:s A', time())."\n";
 
@@ -89,19 +87,19 @@ if (file_exists(PARAMFILE)) {
 			echo "\n**********************************/\n";
 		}
 
-		// è¾“å‡ºæ–‡ä»¶å†…å®¹
+		// Êä³öÎÄ¼şÄÚÈİ
 		echo $fileContent;
 	} else {
 		echo "/**********************************\n".
-		"å‚æ•°é”™è¯¯\n".
-		"pathidï¼š{$_GET['pathid']}\n".
-		"filesï¼š{$_paramconfig['files']}\n".
+		"²ÎÊı´íÎó\n".
+		"pathid£º{$_GET['pathid']}\n".
+		"files£º{$_paramconfig['files']}\n".
 		"**********************************/\n";
 	}
 } else {
 	echo "/**********************************\n".
-		"PARAMFILE æ–‡ä»¶ä¸å­˜åœ¨\n".
-		"COOKIEï¼š".(isset($_COOKIE[COOKIENAME4HTMLPATH]) ? $_COOKIE[COOKIENAME4HTMLPATH] : 'undefined')."\n".
+		"PARAMFILE ÎÄ¼ş²»´æÔÚ\n".
+		"COOKIE£º".(isset($_COOKIE[COOKIENAME4HTMLPATH]) ? $_COOKIE[COOKIENAME4HTMLPATH] : 'undefined')."\n".
 		"**********************************/\n";
 }
 
@@ -144,7 +142,7 @@ function loadFile($file, &$fileContent, &$filePathArr, &$errorFileArr, $showFile
 }
 
 /**
- * è¯»å–æ–‡ä»¶å†…å®¹ï¼Œå¹¶ç”Ÿæˆè¾“å…¥æ¨¡ç‰ˆ
+ * ¶ÁÈ¡ÎÄ¼şÄÚÈİ£¬²¢Éú³ÉÊäÈëÄ£°æ
  * @param  [type] $file     [description]
  * @param  [type] $filepath [description]
  * @return [type]           [description]
@@ -165,14 +163,14 @@ function fileContentTpl($file, $filepath = false) {
 		}, $content);
 
 
-		// LESSåŒ…å«baseLessæ–‡ä»¶
+		// LESS°üº¬baseLessÎÄ¼ş
 		if ($extension == 'less') {
 			includeLess($file, $content);
 		}
 	}
 
 
-	// æ˜¯å¦è¦ç”Ÿæˆè¿™ä¸€æ®µæ³¨é‡Šï¼ˆå•ä¸ªæ–‡ä»¶çš„è¯ï¼Œä¸éœ€è¦ï¼‰
+	// ÊÇ·ñÒªÉú³ÉÕâÒ»¶Î×¢ÊÍ£¨µ¥¸öÎÄ¼şµÄ»°£¬²»ĞèÒª£©
 	if ($filepath) {
 		$str = "\n\n\n\n\n\n\n\n\n\n\n\n".
 				"/**********************************\n\n".

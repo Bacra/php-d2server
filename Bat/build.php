@@ -20,7 +20,7 @@ if (file_exists(CONFIGFILE)) {
 
 if (is_array($config)) {
 	foreach ($config['files'] AS $outputFile => $inputFiles) {
-		$arr = array();			// ç”¨æ¥å­˜æ”¾éœ€è¦åˆå¹¶çš„æ–‡ä»¶
+		$arr = array();			// ÓÃÀ´´æ·ÅĞèÒªºÏ²¢µÄÎÄ¼ş
 		
 		foreach ($inputFiles AS $inputFile) {
 			if (is_array($inputFile)) {
@@ -31,39 +31,40 @@ if (is_array($config)) {
 			}
 		}
 
-		// å‹ç¼©æ–‡ä»¶å’Œæœªå‹ç¼©æ–‡ä»¶å­˜æ”¾ç›®å½•è®¾ç½®
-		$targetFile = ROOT.$outputFile;					// ç›®æ ‡æ–‡ä»¶ æœªå‹ç¼©çš„
-		// å°†æ–‡ä»¶è½¬ç§»åˆ°æ­£å¼ç›®å½•ä¸‹
-		$compressFile = ROOT.BUILDDIR.$outputFile;		// å¯èƒ½ä¼šè¢«å‹ç¼©çš„
+		// Ñ¹ËõÎÄ¼şºÍÎ´Ñ¹ËõÎÄ¼ş´æ·ÅÄ¿Â¼ÉèÖÃ
+		$targetFile = ROOT.$outputFile;					// Ä¿±êÎÄ¼ş Î´Ñ¹ËõµÄ
+		// ½«ÎÄ¼ş×ªÒÆµ½ÕıÊ½Ä¿Â¼ÏÂ
+		$compressFile = ROOT.BUILDDIR.$outputFile;		// ¿ÉÄÜ»á±»Ñ¹ËõµÄ
 		makeDirs($targetFile);
 		makeDirs($compressFile);
 
 
-		// åˆå¹¶æ–‡ä»¶
+		// ºÏ²¢ÎÄ¼ş
 		$str = '';
 		foreach($arr AS $filepath) {
 			$str .= @file_get_contents($filepath)."\n\n";
 		}
-		$rs = @file_put_contents($targetFile, $str."\n\n");		// æœ«å°¾æ·»åŠ \n\nï¼Œç¡®ä¿å¿…æœ‰å†…å®¹å†™å…¥
+		$rs = @file_put_contents($targetFile, $str."\n\n");		// Ä©Î²Ìí¼Ó\n\n£¬È·±£±ØÓĞÄÚÈİĞ´Èë
 		if (!$rs) {
-			showCmdMsg("[ERROR] æ–‡ä»¶å†…å®¹å†™å…¥å¤±è´¥\n	$targetFile");
+			Console::error("ÎÄ¼şÄÚÈİĞ´ÈëÊ§°Ü");
+			Console::error("	$targetFile");
 			exit();
 		}
 
 		
 		$outputPathinfo = pathinfo($outputFile);
 		
-		// åˆ¤æ–­æ˜¯å¦éœ€è¦å‹ç¼©
+		// ÅĞ¶ÏÊÇ·ñĞèÒªÑ¹Ëõ
 		if (stripos($outputPathinfo['basename'], '.min.') === false) {
 			copy($targetFile, $compressFile);
 			continue;
 		}
 
-		// éœ€è¦å‹ç¼©çš„æ–‡ä»¶å¤„ç†
-		// å…ˆå¤‡ä»½ä¸€ä»½æœªå‹ç¼©çš„åˆ°.build
+		// ĞèÒªÑ¹ËõµÄÎÄ¼ş´¦Àí
+		// ÏÈ±¸·İÒ»·İÎ´Ñ¹ËõµÄµ½.build
 		// copy($targetFile, str_replace('.min.', '.', $compressFile));
 
-		// å‹ç¼©æ–‡ä»¶
+		// Ñ¹ËõÎÄ¼ş
 		$outputType = $outputPathinfo['extension'];
 		if ($outputType == 'js') {
 			compressJS($targetFile, $compressFile);
@@ -72,28 +73,29 @@ if (is_array($config)) {
 		}
 
 
-		// æ·»åŠ æ³¨é‡Šä¿¡æ¯
-		// æ³¨æ„ï¼šåªé’ˆå¯¹å‹ç¼©åçš„æ–‡ä»¶æ·»åŠ 
+		// Ìí¼Ó×¢ÊÍĞÅÏ¢
+		// ×¢Òâ£ºÖ»Õë¶ÔÑ¹ËõºóµÄÎÄ¼şÌí¼Ó
 		$fileContent = @file_get_contents($compressFile);
 		if (JSMINCONSOLE && $outputType == 'js') {
-			// åˆ é™¤ä»£ç ä¸­consoleæµ‹è¯•ä»£ç 
+			// É¾³ı´úÂëÖĞconsole²âÊÔ´úÂë
 			// (?:log|info|warn|assert|debug)
 			$fileContent = preg_replace_callback('/console\.log\(.*?\);?/', function($matches){
-				showCmdMsg("[CONSOLE ERROR] å­˜åœ¨consoleå‘½ä»¤ï¼Œå°†äºˆä»¥åˆ é™¤\n	{$matches[0]}\n");
+				Console::warn("´æÔÚconsoleÃüÁî£¬½«ÓèÒÔÉ¾³ı");
+				Console::warn("	{$matches[0]}");
 				return '';
 			}, $fileContent);
 
 
-		// cssæ–‡ä»¶ä¸­imgå¢åŠ ç‰ˆæœ¬å·
-		// ç‰ˆæœ¬å·ä¸ºæ–‡ä»¶ä¿®æ”¹çš„æ—¶é—´æˆ³
+		// cssÎÄ¼şÖĞimgÔö¼Ó°æ±¾ºÅ
+		// °æ±¾ºÅÎªÎÄ¼şĞŞ¸ÄµÄÊ±¼ä´Á
 		} else if (CSSMINIMGVARSION && $outputType == 'css') {
 			$fileContent = buildCss($targetFile, $fileContent);
 		}
 
 		$fileContent = "/**********************************************\n"
-				// ."		â˜… ççˆ±ç”Ÿå‘½ è¯·å‹¿ä¿®æ”¹æ­¤æ–‡ä»¶ â˜…\n"
+				// ."		¡ï Õä°®ÉúÃü ÇëÎğĞŞ¸Ä´ËÎÄ¼ş ¡ï\n"
 				// ."		=============================\n"
-				."	å¦‚é‡éœ€æ±‚å˜æ›´ è¯·è”ç³»å‰ç«¯åè°ƒä¿®æ”¹\n"
+				."	ÈçÓöĞèÇó±ä¸ü ÇëÁªÏµÇ°¶ËĞ­µ÷ĞŞ¸Ä\n"
 				."	E-mail:wf@tianqu.com.cn   QQ:434537707\n"
 				// ."	File:$outputFile\n"
 				// ."	Update:".TIME."\n"
@@ -102,12 +104,27 @@ if (is_array($config)) {
 		
 		$rs = @file_put_contents($compressFile, $fileContent);
 		if (!$rs) {
-			showCmdMsg("[ERROR] å‹ç¼©æ–‡ä»¶å†…å®¹å†™å…¥å¤±è´¥\n	$compressFile");
+			Console::error("Ñ¹ËõÎÄ¼şÄÚÈİĞ´ÈëÊ§°Ü");
+			Console::error("	$compressFile");
 			exit();
 		}
 	}
 } else {
 	exit('Config File has Wrong Content!!');
+}
+
+
+
+// Êä³öĞÅÏ¢
+$warnMsg = Console::getWarn();
+$errorMsg = Console::getError();
+$warnMsgNum = count($warnMsg);
+$errorMsgNum = count($errorMsg);
+
+if ($warnMsgNum || $errorMsgNum) {
+	if ($warnMsgNum) echo "[Warn]\n".implode("\n", $warnMsg);
+	if ($errorMsgNum) echo "[Error]\n".implode("\n", $errorMsg);
+	echo "\n";
 }
 
 
@@ -120,11 +137,8 @@ if (is_array($config)) {
 
 
 
-
-
-
-// è·å–æœ‰æ•ˆçš„ æ–‡ä»¶ç›®å½•
-// æœŸé—´ä¹Ÿä¼šå¯¹lessæ–‡ä»¶è¿›è¡Œç¼–è¯‘æ“ä½œ
+// »ñÈ¡ÓĞĞ§µÄ ÎÄ¼şÄ¿Â¼
+// ÆÚ¼äÒ²»á¶ÔlessÎÄ¼ş½øĞĞ±àÒë²Ù×÷
 function getValidInputfiles($inputFiles) {
 	$arr = array();
 	
@@ -135,19 +149,20 @@ function getValidInputfiles($inputFiles) {
 
 		if (file_exists($inputFile)) {
 			if ($type == 'less') {
-				// ç¼–è¯‘lessæ–‡ä»¶
+				// ±àÒëlessÎÄ¼ş
 				$outputFile = ROOT.MODULEDIR.$pathinfo['dirname'].'/'.$pathinfo['filename'].'.css';
 				makeDirs($outputFile);
 
-				// åˆ¤æ–­æ–‡ä»¶æ˜¯å¦å­˜åœ¨ å¹¶ä¸”æ˜¯æœ€æ–°çš„
-				// å¦‚æœä¸æ˜¯æœ€æ–°çš„æ–‡ä»¶ï¼Œç”Ÿæˆæ–‡ä»¶
+				// ÅĞ¶ÏÎÄ¼şÊÇ·ñ´æÔÚ ²¢ÇÒÊÇ×îĞÂµÄ
+				// Èç¹û²»ÊÇ×îĞÂµÄÎÄ¼ş£¬Éú³ÉÎÄ¼ş
 				if (tempLess($inputFile, $outputFile)) $arr[] = $outputFile;
 
 			} else {
 				$arr[] = $inputFile;
 			}
 		} else {
-			showCmdMsg("[ERROR] æ–‡ä»¶ä¸å­˜åœ¨ è·³è¿‡\n	$inputFile\n");
+			Console::error("ÎÄ¼ş²»´æÔÚ Ìø¹ı");
+			Console::error("	$inputFile");
 		}
 	}
 	

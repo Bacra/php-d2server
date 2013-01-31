@@ -3,11 +3,11 @@ require './common.inc.php';
 
 header("Content-Type:text/html;charset=utf-8");
 
-// é’ˆå¯¹Windowsçš„è·¯å¾„ç¼–ç é—®é¢˜ å¿…é¡»æ˜¯GB2312ç¼–ç 
+// Õë¶ÔWindowsµÄÂ·¾¶±àÂëÎÊÌâ ±ØĞëÊÇGB2312±àÂë
 // $_SERVER["REDIRECT_URL"]
-define('HTMLFILE', mb_convert_encoding(DOMAINROOT.urldecode($_GET['file']), "GB2312", "UTF-8"));		// HTMLæ–‡ä»¶è·¯å¾„
-define('HTMLDIR', dirname(HTMLFILE).'/');		// HTMLæ‰€åœ¨æ–‡ä»¶ç›®å½•
-// é…ç½®æ–‡ä»¶ç›®å½•
+define('HTMLFILE', DOMAINROOT.$_GET['file']);		// HTMLÎÄ¼şÂ·¾¶
+define('HTMLDIR', dirname(HTMLFILE).'/');		// HTMLËùÔÚÎÄ¼şÄ¿Â¼
+// ÅäÖÃÎÄ¼şÄ¿Â¼
 define('CONFIGFILE', HTMLDIR.CONFIGPATH);
 define('PARAMFILE', HTMLDIR.PARAMPATH);
 define('HTMLPART', isset($_GET['part']) ? $_GET['part'] : false);
@@ -27,8 +27,8 @@ if (file_exists(PARAMFILE)) {
 
 
 // var_dump($_SERVER['REDIRECT_URL']);
-// æ–‡ä»¶ç¼“å­˜æœºåˆ¶
-// æ³¨æ„ï¼šåªç¼“å­˜æœ€åçš„ç»“æœï¼Œå•å•ä¿®æ”¹htmlæˆ–åˆ™ä¿®æ”¹configï¼Œéƒ½ä¼šå¯¼è‡´è„±ç¦»æ–‡ä»¶ç¼“å­˜æœºåˆ¶
+// ÎÄ¼ş»º´æ»úÖÆ
+// ×¢Òâ£ºÖ»»º´æ×îºóµÄ½á¹û£¬µ¥µ¥ĞŞ¸Ähtml»òÔòĞŞ¸Äconfig£¬¶¼»áµ¼ÖÂÍÑÀëÎÄ¼ş»º´æ»úÖÆ
 
 $pathinfo = pathinfo(HTMLFILE);
 define('CACHEHTMLFILE', HTMLDIR.CACHEHTMLDIR.$pathinfo['filename'].'-4-'.HTMLPART.'.'.$pathinfo['extension']);
@@ -38,8 +38,8 @@ if (file_exists(HTMLFILE)) {
 		echo file_get_contents(HTMLFILE);
 		exit();
 	} else if (file_exists(CONFIGFILE)) {
-		// è¦ä½¿ç”¨ CACHEHTMLFILEæ–‡ä»¶
-		// å¿…é¡»æ£€æŸ¥PARAMFILEæ˜¯å¦å­˜åœ¨ ä»¥åŠCONFIGFILEåŠHTMLFILEçš„æ›´æ–°æ—¶é—´
+		// ÒªÊ¹ÓÃ CACHEHTMLFILEÎÄ¼ş
+		// ±ØĞë¼ì²éPARAMFILEÊÇ·ñ´æÔÚ ÒÔ¼°CONFIGFILE¼°HTMLFILEµÄ¸üĞÂÊ±¼ä
 		if (file_exists(CACHEHTMLFILE) && file_exists(PARAMFILE) && @filemtime(CACHEHTMLFILE) > @filemtime(HTMLFILE) && @filemtime(CACHEHTMLFILE) > @filemtime(CONFIGFILE)){
 			echo file_get_contents(CACHEHTMLFILE);
 			exit();
@@ -47,7 +47,7 @@ if (file_exists(HTMLFILE)) {
 			$content = file_get_contents(HTMLFILE);
 			if (HTMLPART) $content = modelHTML($content, HTMLPART);
 		}
-	} else {		// ä¸å­˜åœ¨CONFIGFILE ä½†å­˜åœ¨HTMLPART
+	} else {		// ²»´æÔÚCONFIGFILE µ«´æÔÚHTMLPART
 		
 		/* if (file_exists(CACHEHTMLFILE) && @filemtime(CACHEHTMLFILE) > @filemtime(HTMLFILE)) {
 			echo file_get_contents(CACHEHTMLFILE);
@@ -60,7 +60,7 @@ if (file_exists(HTMLFILE)) {
 		}
 		*/
 
-		// å¦‚æœCONFIGFILE ä¸å­˜åœ¨ï¼Œä¸èƒ½ä½¿ç”¨HTMLPARTå‚æ•°
+		// Èç¹ûCONFIGFILE ²»´æÔÚ£¬²»ÄÜÊ¹ÓÃHTMLPART²ÎÊı
 		exit('CONFIGFILE not exits');
 	}
 } else {
@@ -73,12 +73,12 @@ if (file_exists(HTMLFILE)) {
 
 
 
-// js css less åœ°å€è½¬åŒ–
+// js css less µØÖ·×ª»¯
 $config = @include(CONFIGFILE);
 
 $hasLESS = false;
 if (is_array($config)) {
-	// sessionåˆå§‹åŒ–
+	// session³õÊ¼»¯
 	if (!isset($_paramconfig['path'])) {
 		$_paramconfig['path'] = array();
 		$_paramconfig['files'] = array();
@@ -86,10 +86,10 @@ if (is_array($config)) {
 	// echo $content;
 	// var_dump($config);
 
-	// éå†é…ç½®æ–‡ä»¶
+	// ±éÀúÅäÖÃÎÄ¼ş
 	foreach ($config['files'] AS $outputFile => $inputFiles) {
 		$_paramconfig[$outputFile] = $inputFiles;
-		// è·å–æ–‡ä»¶æ–‡ä»¶ç±»å‹
+		// »ñÈ¡ÎÄ¼şÎÄ¼şÀàĞÍ
 		$outputPathinfo = pathinfo($outputFile);
 		$outputType = $outputPathinfo['extension'];
 		$preg = preg_encode($outputFile);
@@ -107,7 +107,7 @@ if (is_array($config)) {
 			$printArr = array();
 			foreach($inputFiles AS $key => $inputFile) {
 				
-				// æ–‡ä»¶é›†åˆï¼Œéœ€è¦åˆå¹¶åˆ°ä¸€ä¸ªæ–‡ä»¶ä¸­
+				// ÎÄ¼ş¼¯ºÏ£¬ĞèÒªºÏ²¢µ½Ò»¸öÎÄ¼şÖĞ
 				if (is_array($inputFile)) {
 					$myfiles = array();
 
@@ -117,13 +117,13 @@ if (is_array($config)) {
 					foreach($inputFile AS $val) {
 						$filedir = HTMLDIR.SOURCEDIR.$val;
 
-						// åˆ¤æ–­æ–‡ä»¶æ˜¯å¦å­˜åœ¨
+						// ÅĞ¶ÏÎÄ¼şÊÇ·ñ´æÔÚ
 						if (!file_exists($filedir)) {
-							$printArr[] = "\n\n<!-- [Convert ERROR] $inputFile æ–‡ä»¶ä¸¢å¤± æ— æ³•å¼•å…¥ -->\n\n";
+							$printArr[] = "\n\n<!-- [Convert ERROR] $inputFile ÎÄ¼ş¶ªÊ§ ÎŞ·¨ÒıÈë -->\n\n";
 							continue;
 						}
 
-						// lessè§£ææˆcssæ–‡ä»¶
+						// less½âÎö³ÉcssÎÄ¼ş
 						if ($sourceType == 'css') {
 							$myPathinfo = pathinfo($val);
 							if ($myPathinfo['extension'] == 'less') {
@@ -137,8 +137,8 @@ if (is_array($config)) {
 						$myfiles[] = $filedir;
 					}
 
-					// è®¾ç½®fileså‚æ•°
-					// ç»„è£…files[]å‚æ•°é›†åˆ
+					// ÉèÖÃfiles²ÎÊı
+					// ×é×°files[]²ÎÊı¼¯ºÏ
 					// $urlfiles = array();
 					// foreach ($myUrlfiles AS $val) {
 					// 	$urlfiles[] = 'files[]='.urlencode($val);
@@ -147,13 +147,13 @@ if (is_array($config)) {
 					
 					$inputFile = $key;
 
-				// å•ç‹¬ä¸€ä¸ªæ–‡ä»¶
+				// µ¥¶ÀÒ»¸öÎÄ¼ş
 				} else {
 					$myfiles = HTMLDIR.SOURCEDIR.$inputFile;
-					// å¦‚æœæ–‡ä»¶ä¸å­˜åœ¨ï¼Œå°±ä¸æ·»åŠ 
-					// lesså¦‚æœæ–‡ä»¶ä¸å­˜åœ¨ç»§ç»­å¼•å…¥ï¼Œä¼šæŠ¥é”™
+					// Èç¹ûÎÄ¼ş²»´æÔÚ£¬¾Í²»Ìí¼Ó
+					// lessÈç¹ûÎÄ¼ş²»´æÔÚ¼ÌĞøÒıÈë£¬»á±¨´í
 					if (!file_exists($myfiles)) {
-						$printArr[] = "\n\n<!-- [Convert ERROR] $inputFile æ–‡ä»¶ä¸¢å¤± æ— æ³•å¼•å…¥ -->\n\n";
+						$printArr[] = "\n\n<!-- [Convert ERROR] $inputFile ÎÄ¼ş¶ªÊ§ ÎŞ·¨ÒıÈë -->\n\n";
 						continue;
 					}
 
@@ -166,7 +166,7 @@ if (is_array($config)) {
 
 
 
-				$fullPath = dirname($_SERVER['REDIRECT_URL']).'/'.$inputFile;
+				$fullPath = dirname($_GET['file']).'/'.$inputFile;
 				if (isset($_paramconfig['path'][$fullPath])) {
 					$index = $_paramconfig['path'][$fullPath];
 					$_paramconfig['files'][] = $myfiles;
@@ -175,19 +175,19 @@ if (is_array($config)) {
 					$_paramconfig['path'][$fullPath] = $index;
 				}
 
-				// è·å–æ–‡ä»¶å‘½å
+				// »ñÈ¡ÎÄ¼şÃüÃû
 				$sourceBasename = preg_replace('/\.[^\.]+$/', '.m'.$index.'$0', $sourcePathinfo['basename']);
 
 
-				// æ³¨æ„ï¼šéœ€è¦å°†æ–‡ä»¶å¤¹åˆå¹¶åˆ°æ–‡ä»¶åä¸­
+				// ×¢Òâ£ºĞèÒª½«ÎÄ¼ş¼ĞºÏ²¢µ½ÎÄ¼şÃûÖĞ
 				/*if ($sourcePathinfo['dirname'] && $sourcePathinfo['dirname'] != '.') {
 					$sourceBasename = '__'.preg_replace('/[\/\\\\]/', '_._', $sourcePathinfo['dirname']).'__'.$sourceBasename;
 				}*/
 
 
-				// ä½¿ç”¨phpæ¥è·å–ç´ ææ–‡ä»¶
-				// åŸå› ï¼šcssä¸­çš„åœ°å€ï¼Œéœ€è¦é€šè¿‡phpæ¥ä¼ªé™æ€å¤„ç†
-				// æ³¨æ„ï¼šç”±äºlessçš„idå‘½åæ˜¯æ ¹æ®æ–‡ä»¶åæ¥å¤„ç†çš„ï¼Œæ‰€ä»¥â€¦â€¦sourceä¸­çš„æ–‡ä»¶åå’Œç›®å½•å¿…é¡»è½¬åŒ–ä¸ºç›¸åº”çš„æ–‡ä»¶å
+				// Ê¹ÓÃphpÀ´»ñÈ¡ËØ²ÄÎÄ¼ş
+				// Ô­Òò£ºcssÖĞµÄµØÖ·£¬ĞèÒªÍ¨¹ıphpÀ´Î±¾²Ì¬´¦Àí
+				// ×¢Òâ£ºÓÉÓÚlessµÄidÃüÃûÊÇ¸ù¾İÎÄ¼şÃûÀ´´¦ÀíµÄ£¬ËùÒÔ¡­¡­sourceÖĞµÄÎÄ¼şÃûºÍÄ¿Â¼±ØĞë×ª»¯ÎªÏàÓ¦µÄÎÄ¼şÃû
 				// $filePath = $outputPathinfo['dirname'].'/'.$sourceBasename.'.fsrc?extension='.$sourceType.'&'.$urlfiles;
 					//.'&ver='.cutInteger(TIME);
 				
@@ -195,11 +195,11 @@ if (is_array($config)) {
 
 
 				
-				// å°†cssè½¬ä¸ºä¸ºless
+				// ½«css×ªÎªÎªless
 				if ($sourceType == 'css' && HTMLALLLESS) $sourceType = 'less';
 
 
-				// ç”Ÿæˆå†™å…¥çš„å­—ç¬¦ä¸²
+				// Éú³ÉĞ´ÈëµÄ×Ö·û´®
 				if ($sourceType == 'css') {
 					$printArr[] = '<link type="text/css" rel="stylesheet" href="'.$filePath.'" />';
 				} else if ($sourceType == 'less') {
@@ -215,10 +215,10 @@ if (is_array($config)) {
 
 
 
-	// å¦‚æœä½¿ç”¨äº†LESSï¼Œå°±åœ¨headé‡Œé¢æ·»åŠ lesså¤„ç†æ–‡ä»¶
+	// Èç¹ûÊ¹ÓÃÁËLESS£¬¾ÍÔÚheadÀïÃæÌí¼Óless´¦ÀíÎÄ¼ş
 	$content = str_replace('</head>', '<script type="text/javascript" src="'.LESSPATH.'"></script>'."\r\n".'</head>', $content);
 
-	// æ·»åŠ è¯´æ˜æ–‡å­—
+	// Ìí¼ÓËµÃ÷ÎÄ×Ö
 	$content = str_replace('<head>', "<head>\n<!-- UPDATA BY ".CONFIGPATH." -->\n<!-- MTIME ".date('l dS \of F Y h:i:s A', @filemtime(HTMLFILE)).(HTMLNOCACHE ? " -->\n<!-- NOW ".date('l dS \of F Y h:i:s A', TIME) : '').' -->'
 		 , $content);
 }
@@ -227,13 +227,12 @@ if (is_array($config)) {
 
 file_put_contents(PARAMFILE, "<?php\nreturn ".var_export($_paramconfig, true).";\n?>");
 
-// è¾“å‡ºå†…å®¹
-// ä¸ç®¡æ˜¯å¦å­˜åœ¨configï¼Œéƒ½è¦è¾“å…¥å‡ºå†…å®¹
+// Êä³öÄÚÈİ
+// ²»¹ÜÊÇ·ñ´æÔÚconfig£¬¶¼ÒªÊäÈë³öÄÚÈİ
 ob_clean();
 echo $content;
 
-
-// åˆ›å»ºç¼“å­˜
+// ´´½¨»º´æ
 mkdirs(dirname(CACHEHTMLFILE));
 file_put_contents(CACHEHTMLFILE, $content);
 ?>

@@ -37,7 +37,7 @@ switch($_GET('type')) {
 	case 'build':
 		$pathinfo = pathinfo(HTMLPATH);
 		if (!file_exists(HTMLPATH)) {
-			echo json_encode(array('status'=>'HTMLæ–‡ä»¶ä¸å­˜åœ¨'));
+			echo json_encode(array('status'=>'HTMLÎÄ¼ş²»´æÔÚ'));
 			exit();
 		}
 		define('HTMLPART', isset($_GET['part']) ? $_GET['part'] : false);

@@ -1,12 +1,12 @@
 <?php
-// ä¸‰ä¸ªç›®å½•å½¢å¼ 
+// Èı¸öÄ¿Â¼ĞÎÊ½ 
 // dir path file
 
-// è®¾ç½®æ—¶åŒº
+// ÉèÖÃÊ±Çø
 date_default_timezone_set("PRC");
 
 
-// å¤–éƒ¨è°ƒç”¨ç¨‹åºåŠJARè·¯å¾„
+// Íâ²¿µ÷ÓÃ³ÌĞò¼°JARÂ·¾¶
 define('JAVA', 'JAVA');
 define('CLOSURECOMPILER', '"%ClosureCompiler%compiler.jar"');
 define('YUICOMPRESSOR', '"%YUIcompressor%yuicompressor.jar"');
@@ -14,38 +14,38 @@ define('LESSC', 'LESSC');
 
 
 
-// æœåŠ¡å™¨åŸŸåæ ¹ç›®å½•æ‰€å¯¹åº”çš„æ–‡ä»¶å¤¹ç›®å½•
+// ·şÎñÆ÷ÓòÃû¸ùÄ¿Â¼Ëù¶ÔÓ¦µÄÎÄ¼ş¼ĞÄ¿Â¼
 define('DOMAINROOT', 'w:/');
 
 
-// æ³¨æ„ï¼šç›¸å¯¹çš„æ˜¯åŸŸåæ ¹ç›®å½•
-define('LESSPATH', 'Less/less-1.3.3.js');
-// é…ç½®æ–‡ä»¶ç›¸å¯¹HTMLæ ¹ç›®å½•çš„ç›¸å¯¹è·¯å¾„
-// ä¿®æ”¹æ­¤å‚æ•°ä¹‹åï¼Œæ³¨æ„ä¿®æ”¹buildæ–‡ä»¶ä¸­çš„ROOTç›®å½•
+// ×¢Òâ£ºÏà¶ÔµÄÊÇÓòÃû¸ùÄ¿Â¼
+define('LESSPATH', '//www.test.com:3316/Less/less-1.3.3.js');
+// ÅäÖÃÎÄ¼şÏà¶ÔHTML¸ùÄ¿Â¼µÄÏà¶ÔÂ·¾¶
+// ĞŞ¸Ä´Ë²ÎÊıÖ®ºó£¬×¢ÒâĞŞ¸ÄbuildÎÄ¼şÖĞµÄROOTÄ¿Â¼
 define('CONFIGPATH', '.source/.buildconfig');
 define('PARAMPATH', '.temp/.paramconfig');
 define('COOKIENAME4HTMLPATH', 'WFHTMLPATH');
 
 
-define('SOURCEDIR', '.source/');		// å­˜æ”¾å¼€å‘æ–‡ä»¶çš„ç›®å½•
-define('BUILDDIR', '.temp/.build/');			// å­˜æ”¾ç”Ÿæˆæ–‡ä»¶çš„ç›®å½•
-define('MODULEDIR', '.temp/.module/');	// å­˜æ”¾ç”Ÿæˆæ–‡ä»¶æ—¶ä¸´æ—¶å¯¼å‡ºæ–‡ä»¶çš„ç›®å½•
+define('SOURCEDIR', '.source/');		// ´æ·Å¿ª·¢ÎÄ¼şµÄÄ¿Â¼
+define('BUILDDIR', '.temp/.build/');			// ´æ·ÅÉú³ÉÎÄ¼şµÄÄ¿Â¼
+define('MODULEDIR', '.temp/.module/');	// ´æ·ÅÉú³ÉÎÄ¼şÊ±ÁÙÊ±µ¼³öÎÄ¼şµÄÄ¿Â¼
 define('CACHEHTMLDIR', '.temp/.HTML/');
 
 
 
-// å‹ç¼©æ–‡ä»¶çš„é…ç½®
-define('JSMINCONSOLE', true);	// falseå‹ç¼©æ–‡ä»¶åˆ é™¤consoleæµ‹è¯•ä»£ç 
-define('CSSMINIMGVARSION', true);	// é’ˆå¯¹cssä¸­å›¾ç‰‡å¯åŠ¨æ–‡ä»¶ç‰ˆæœ¬åç¼€
+// Ñ¹ËõÎÄ¼şµÄÅäÖÃ
+define('JSMINCONSOLE', true);	// falseÑ¹ËõÎÄ¼şÉ¾³ıconsole²âÊÔ´úÂë
+define('CSSMINIMGVARSION', true);	// Õë¶ÔcssÖĞÍ¼Æ¬Æô¶¯ÎÄ¼ş°æ±¾ºó×º
 
-// HTMLå†…å®¹è½¬åŒ–é…ç½®
-// é…ç½®ä¹‹åHTMLå†…å®¹ä¸­è‡ªåŠ¨æ·»åŠ ç›¸åº”çš„æ—¶é—´æˆ³
-// æ³¨æ„ï¼šfalseçš„æ—¶å€™ï¼Œä¹Ÿä¼šæ·»åŠ æ–‡ä»¶æ›´æ”¹çš„æ—¶é—´æˆ³
+// HTMLÄÚÈİ×ª»¯ÅäÖÃ
+// ÅäÖÃÖ®ºóHTMLÄÚÈİÖĞ×Ô¶¯Ìí¼ÓÏàÓ¦µÄÊ±¼ä´Á
+// ×¢Òâ£ºfalseµÄÊ±ºò£¬Ò²»áÌí¼ÓÎÄ¼ş¸ü¸ÄµÄÊ±¼ä´Á
 define('HTMLNOCACHE', true);
-define('HTMLALLLESS', false);		// å°†æ‰€æœ‰çš„csså…¨éƒ¨è½¬åŒ–ä¸ºLESSè¿›è¡ŒåŠ è½½
+define('HTMLALLLESS', false);		// ½«ËùÓĞµÄcssÈ«²¿×ª»¯ÎªLESS½øĞĞ¼ÓÔØ
 
 
-// ç”¨æ¥ç”Ÿæˆç‰ˆæœ¬å· ä»¥åŠæ–‡ä»¶æ˜¯å¦éœ€è¦ç¼“å­˜çš„åˆ¤æ–­
+// ÓÃÀ´Éú³É°æ±¾ºÅ ÒÔ¼°ÎÄ¼şÊÇ·ñĞèÒª»º´æµÄÅĞ¶Ï
 define('TIME', time());
 
 
@@ -56,12 +56,13 @@ define('TIME', time());
 
 
 
-// åˆ›å»ºç›®å½•
+// ´´½¨Ä¿Â¼
 function makeDirs($file) {
 	$dirname = dirname($file);
 	if (!is_dir($dirname)) {
-		showCmdMsg("[MESSAGE PHP] ç›®å½•ä¸å­˜åœ¨ å³å°†åˆ›å»ºå¦‚ä¸‹ç›®å½•\n	$dirname");
-		showCmdMsg(mkdirs($dirname) ? "[åˆ›å»ºæˆåŠŸ]\n": "[åˆ›å»ºå¤±è´¥]\n");
+		Console::warn("[MESSAGE PHP] Ä¿Â¼²»´æÔÚ ¼´½«´´½¨ÈçÏÂÄ¿Â¼");
+		Console::warn("	$dirname");
+		Console::warn(mkdirs($dirname) ? "[´´½¨³É¹¦]": "[´´½¨Ê§°Ü]");
 	}
 }
 
@@ -86,12 +87,10 @@ function mkdirs($dirname) {
 function compressJS($inputFile, $outputFile){
 	$execCommand = JAVA.' -jar '.CLOSURECOMPILER.' --js "'.$inputFile.'" --js_output_file "'.$outputFile.'"';
 	$execCommand = str_replace('/', "\\", $execCommand);
-	exec($execCommand, $return, $code);	
+	@exec($execCommand, $return, $code);	
 
 	if ($code != 0) {
-		// printf("[ERROR Compiler] %s (%s)", join("\n", $return), $code);
-		// echo "\n";
-
+		Console::error($return);
 		return false;
 	}
 	
@@ -102,12 +101,10 @@ function compressJS($inputFile, $outputFile){
 function compressCss($inputFile, $outputFile){
 	$execCommand = JAVA.' -jar '.YUICOMPRESSOR.' "'.$inputFile.'" -o "'.$outputFile.'"';
 	$execCommand = str_replace('/', "\\", $execCommand);
-	exec($execCommand, $return, $code);	
+	@exec($execCommand, $return, $code);	
 
 	if ($code != 0) {
-		// printf("[ERROR YUIcompressor] %s (%s)", join("\n", $return), $code);
-		// echo "\n";
-
+		Console::error($return);
 		return false;
 	}
 	
@@ -116,7 +113,7 @@ function compressCss($inputFile, $outputFile){
 
 
 function buildLess($lessFile, $cssFile){
-	// å¤„ç†æ–‡ä»¶ä¸­çš„$includeçš„å†…å®¹
+	// ´¦ÀíÎÄ¼şÖĞµÄ$includeµÄÄÚÈİ
 	$fileContent = @file_get_contents($lessFile);
 	$rs = includeLess($lessFile, $fileContent);
 	if ($rs) {
@@ -129,11 +126,12 @@ function buildLess($lessFile, $cssFile){
 	
 	$execCommand = str_replace('/', "\\", $execCommand);
 	// echo $execCommand;
-	exec($execCommand, $return, $code);
+	@exec($execCommand, $return, $code);
 
 	if ($code != 0) {
-		// printf("[ERROR LESS] %s (%s)", join("\n", $return), $code);
-		// showCmdMsg("[ERROR] åˆå¹¶æ–‡ä»¶ä¸­å°†ä¸åŒ…å«æ­¤æ–‡ä»¶å†…å®¹\n	$lessFile\n");
+		Console::error($return);
+		// Console::error("[ERROR] ºÏ²¢ÎÄ¼şÖĞ½«²»°üº¬´ËÎÄ¼şÄÚÈİ");
+		// Console::error("	$lessFile");
 
 		return false;
 	}
@@ -142,7 +140,7 @@ function buildLess($lessFile, $cssFile){
 }
 
 
-// æ³¨æ„ï¼šè¿”å›å€¼ä¸æ˜¯$fileContent
+// ×¢Òâ£º·µ»ØÖµ²»ÊÇ$fileContent
 function includeLess($lessFile, &$fileContent){
 	$lessPath = dirname($lessFile).'/';
 	$edited = false;
@@ -167,14 +165,14 @@ function buildCss($filePath, $fileContent){
 	$imgFiles = array();
 	$errorImgFiles = array();
 
-	// è¯»å–æ–‡ä»¶ç›®å½•ä¿¡æ¯
+	// ¶ÁÈ¡ÎÄ¼şÄ¿Â¼ĞÅÏ¢
 	if (!$fileContent) $fileContent = @file_get_contents($filePath);
 
 	$fileContent = preg_replace_callback('/url\((["\']?)(.*?)\1\)/', function($matches) use($filePath, &$imgFiles, &$errorImgFiles){
-		// é’ˆå¯¹base64çš„å›¾ç‰‡ç›´æ¥è¿”å›
+		// Õë¶Ôbase64µÄÍ¼Æ¬Ö±½Ó·µ»Ø
 		if (preg_match('/^data:image\/(?:jpeg|png|gif);base64,/i', $matches[2])) return $matches[0];
 
-		// è·å–å›¾ç‰‡æ–‡ä»¶ä¿®æ”¹æ—¶é—´
+		// »ñÈ¡Í¼Æ¬ÎÄ¼şĞŞ¸ÄÊ±¼ä
 		$imgSrc = trim($matches[2]);
 
 		if (isset($imgFiles[$imgSrc])) {
@@ -185,7 +183,7 @@ function buildCss($filePath, $fileContent){
 			if (file_exists($imgPath)) {
 				$mtime = @filemtime($imgPath);
 				// $version = $mtime;
-				// $version = $mtime%10000000000;					// ä¸ä½¿ç”¨éšæœºæ•°å­—ï¼Œä½¿ç”¨æ—¶é—´è¿›è¡Œéšæœºæ’å¸ƒ åªå¤§è‡´è¿›è¡Œç‰ˆæœ¬è®¾ç½®
+				// $version = $mtime%10000000000;					// ²»Ê¹ÓÃËæ»úÊı×Ö£¬Ê¹ÓÃÊ±¼ä½øĞĞËæ»úÅÅ²¼ Ö»´óÖÂ½øĞĞ°æ±¾ÉèÖÃ
 				// $version = base_convert($mtime, 10, 36);
 				$version = cutInteger($mtime);
 				$verPath = strpos($imgSrc, '?') === false ? '?' : '&';
@@ -213,28 +211,25 @@ function buildCss($filePath, $fileContent){
 	}, $fileContent);
 
 
-	// è¾“å‡ºç»Ÿè®¡æƒ…å†µ
+	// Êä³öÍ³¼ÆÇé¿ö
 	$imgFileNum = count($imgFiles);
 	$errorImgFileNum = count($errorImgFiles);
 	if ($imgFileNum > 0 || $errorImgFileNum > 0) {
-		echo "\n";
-		showCmdMsg("[CSS IMG] å¤„ç†CSSæ–‡ä»¶ä¸­çš„å›¾ç‰‡ä¿¡æ¯\n");
-		showCmdMsg("	$filePath\n");
+		Console::log("[CSS IMG] ´¦ÀíCSSÎÄ¼şÖĞµÄÍ¼Æ¬ĞÅÏ¢");
+		Console::log("	$filePath");
 
 		if (count($imgFiles) > 0) {
-			showCmdMsg("[IMG VER] é’ˆå¯¹ä»¥ä¸‹å›¾ç‰‡æ·»åŠ ç‰ˆæœ¬ç¼–å·\n");
+			Console::log("[IMG VER] Õë¶ÔÒÔÏÂÍ¼Æ¬Ìí¼Ó°æ±¾±àºÅ");
 			foreach ($imgFiles AS $key => $value) {
 				// echo $value['mtime'].' '.dechex($value['mtime']);
-				showCmdMsg("	[{$value['version']}][".date('y-m-d', $value['mtime'])."] $key [{$value['num']}æ¬¡]\n");
+				Console::log("	[{$value['version']}][".date('y-m-d', $value['mtime'])."] $key [{$value['num']}´Î]");
 			}
-			echo "\n";
 		}
 		if (count($errorImgFiles) > 0) {
-			showCmdMsg("[IMG ERROR] ä»¥ä¸‹å›¾ç‰‡æ–‡ä»¶ä¸å­˜åœ¨æˆ–åˆ™ä¸å¯è®¿é—®\n");
+			Console::warn("[IMG ERROR] ÒÔÏÂÍ¼Æ¬ÎÄ¼ş²»´æÔÚ»òÔò²»¿É·ÃÎÊ");
 			foreach ($errorImgFiles AS $key => $value) {
-				showCmdMsg("	$key [".$value."æ¬¡]\n");		// BUGå¦‚æœç›´æ¥åœ¨å¼•ç”¨ä¸­å†™å…¥$valueä¼šå¸¦ä¸Šâ€œæ¬¡â€ä½œä¸ºå˜é‡
+				Console::warn("	$key [".$value."´Î]");		// BUGÈç¹ûÖ±½ÓÔÚÒıÓÃÖĞĞ´Èë$value»á´øÉÏ¡°´Î¡±×÷Îª±äÁ¿
 			}
-			echo "\n";
 		}
 	}
 
@@ -242,7 +237,7 @@ function buildCss($filePath, $fileContent){
 }
 
 
-// æ£€æŸ¥ç¼“å­˜æ–‡ä»¶ä¸­æ˜¯å¦å­˜åœ¨
+// ¼ì²é»º´æÎÄ¼şÖĞÊÇ·ñ´æÔÚ
 function tempLess($inputFile, $outputFile){
 	static $arr = array();
 	$key = $inputFile.$outputFile;
@@ -252,9 +247,10 @@ function tempLess($inputFile, $outputFile){
 	}
 
 	/* if (file_exists($outputFile) && @filemtime($outputFile) > @filemtime($inputFile)) {
-		showCmdMsg("[SKIP LESS] æ–‡ä»¶å·²å­˜åœ¨[æœ€æ–°] è·³è¿‡\n	$inputFile\n");
+		showCmdMsg("[SKIP LESS] ÎÄ¼şÒÑ´æÔÚ[×îĞÂ] Ìø¹ı");
+		showCmdMsg("	$inputFile");
 	} else {
-		// ç”Ÿæˆæ–‡ä»¶
+		// Éú³ÉÎÄ¼ş
 		return buildLess($inputFile, $outputFile);
 	} */
 
@@ -262,16 +258,50 @@ function tempLess($inputFile, $outputFile){
 }
 
 
-// è¾“å‡ºcmdä¿¡æ¯
-function showCmdMsg($msg) {
-	echo mb_convert_encoding($msg, "GB2312", "UTF-8");
+
+// ±£´æĞèÒªÊä³öµÄĞÅÏ¢
+class Console {
+	private static $logMsg = array();
+	private static $errorMsg = array();
+	private static $warnMsg = array();
+
+	private static function addMsg($msg, $toMsg){
+		if (is_array($msg)) {
+			$toMsg = array_merge($msg, $toMsg);
+		} else {
+			$toMsg[] = $msg;
+		}
+
+		return $toMsg;
+	}
+
+	public static function log($msg){
+		Console::$logMsg = Console::addMsg($msg, Console::$logMsg);
+	}
+	public static function warn($msg){
+		Console::$warnMsg = Console::addMsg($msg, Console::$warnMsg);
+		Console::$logMsg = Console::addMsg($msg, Console::$logMsg);
+	}
+	public static function error($msg){
+		Console::$errorMsg = Console::addMsg($msg, Console::$errorMsg);
+		Console::$logMsg = Console::addMsg($msg, Console::$logMsg);
+	}
+	public static function getLog(){
+		return Console::$logMsg;
+	}
+	public static function getWarn(){
+		return Console::$warnMsg;
+	}
+	public static function getError(){
+		return Console::$errorMsg;
+	}
 }
 
 
 
 
 /**
- * å°†10è¿›åˆ¶æ•°å­—è¿›è¡Œç¼©å‡
+ * ½«10½øÖÆÊı×Ö½øĞĞËõ¼õ
  * @param  [type] $num [description]
  * @param  [type] $arr [description]
  * @return [type]      [description]
@@ -281,8 +311,8 @@ function cutInteger($num, $ascArr = array('0', '1', '2', '3', '4', '5', '6', '7'
 	convert23($num, count($ascArr), $ascArr, $rs);
 	return implode($rs, '');
 }
-// cutIntegeræ‰§è¡Œ
-// å›è°ƒå‡½æ•°
+// cutIntegerÖ´ĞĞ
+// »Øµ÷º¯Êı
 function convert23($num, $length, &$ascArr, &$rs) {
 	if ($num > $length) convert23($num/$length, $length, $ascArr, $rs);	
 	$rs[] = $ascArr[$num%$length];
@@ -318,9 +348,9 @@ function preg_encode($name){
 
 
 function modelHTML($str, $partParam){
-	$mainRegExp = '/<(\w+)([^>]*) mp="([\w ]+)"([^>]*)([^>\/]?)>/';		// æ³¨æ„ï¼šä¸å¤„ç†<div />è¿™æ ·ç›´æ¥ç»“æŸçš„æ–¹æ³•
+	$mainRegExp = '/<(\w+)([^>]*) mp="([\w ]+)"([^>]*)([^>\/]?)>/';		// ×¢Òâ£º²»´¦Àí<div />ÕâÑùÖ±½Ó½áÊøµÄ·½·¨
 	if (preg_match_all($mainRegExp, $str, $mainMatches, PREG_OFFSET_CAPTURE)) {
-		$tagType = array();		// ä»…ä½œin_arrayåˆ¤æ–­ä½¿ç”¨
+		$tagType = array();		// ½ö×÷in_arrayÅĞ¶ÏÊ¹ÓÃ
 		// $startPlaces = array();
 		// $tagsPlaces = array();
 		$tagsArr = array();
@@ -348,7 +378,7 @@ function modelHTML($str, $partParam){
 				$endTag = '</'.$tag.'>';
 				$strlen = strlen($endTag);
 				$tempMatchs = array();
-				// æ ¸å¿ƒç®—æ³•
+				// ºËĞÄËã·¨
 				foreach($matches[0] AS $val){
 					if ($val[0] == $endTag) {
 						$arrEnd = count($tempMatchs)-1;
@@ -370,7 +400,7 @@ function modelHTML($str, $partParam){
 		}
 		
 		// file_put_contents('D:/03.txt', substr($str, 4638, 2749));
-		// åˆ é™¤åŒºé—´
+		// É¾³ıÇø¼ä
 		$offset = 0;
 		$minSatrt = 0;
 		foreach($tagsArr AS $key => $val) {
@@ -382,7 +412,7 @@ function modelHTML($str, $partParam){
 			}
 		}
 
-		// æœ€åæ¸…æ¥šå‰©ä¸‹çš„æ‰€æœ‰æ ‡ç­¾
+		// ×îºóÇå³şÊ£ÏÂµÄËùÓĞ±êÇ©
 		$str = preg_replace($mainRegExp, '<$1$2$4$5>', $str);
 	}
 
