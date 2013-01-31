@@ -31,20 +31,22 @@ if (file_exists(PARAMFILE)) {
 // 注意：只缓存最后的结果，单单修改html或则修改config，都会导致脱离文件缓存机制
 
 $pathinfo = pathinfo(HTMLFILE);
+$action = $_GET['action'];
 define('CACHEHTMLFILE', HTMLDIR.CACHEHTMLDIR.$pathinfo['filename'].'-4-'.HTMLPART.'.'.$pathinfo['extension']);
 
 if (file_exists(HTMLFILE)) {
-	if (!file_exists(CONFIGFILE) && !HTMLPART) {
-		echo file_get_contents(HTMLFILE);
+	$refresh = strpos($action, 'r') === false ? false : true;
+	if (!file_exists(CONFIGFILE) && !HTMLPART && !$refresh) {
+		echo template(file_get_contents(HTMLFILE), HTMLDIR);
 		exit();
 	} else if (file_exists(CONFIGFILE)) {
 		// 要使用 CACHEHTMLFILE文件
 		// 必须检查PARAMFILE是否存在 以及CONFIGFILE及HTMLFILE的更新时间
-		if (file_exists(CACHEHTMLFILE) && file_exists(PARAMFILE) && @filemtime(CACHEHTMLFILE) > @filemtime(HTMLFILE) && @filemtime(CACHEHTMLFILE) > @filemtime(CONFIGFILE)){
+		if (!$refresh && file_exists(CACHEHTMLFILE) && file_exists(PARAMFILE) && @filemtime(CACHEHTMLFILE) > @filemtime(HTMLFILE) && @filemtime(CACHEHTMLFILE) > @filemtime(CONFIGFILE)){
 			echo file_get_contents(CACHEHTMLFILE);
 			exit();
 		} else {
-			$content = file_get_contents(HTMLFILE);
+			$content = template(file_get_contents(HTMLFILE), HTMLDIR);
 			if (HTMLPART) $content = modelHTML($content, HTMLPART);
 		}
 	} else {		// 不存在CONFIGFILE 但存在HTMLPART

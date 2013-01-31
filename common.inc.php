@@ -418,4 +418,18 @@ function modelHTML($str, $partParam){
 
 	return $str;
 }
+
+function template($content, $path){
+	$content = preg_replace_callback('/<template +file=("|\')([^"\'>]+)\1 *\/>/i', function($matches) use($path){
+		$filePath = $path.SOURCEDIR.trim($matches[2]);
+		if (file_exists($filePath)) {
+			return template(file_get_contents($filePath), $path);
+		} else {
+			return "<!-- $filePath 文件不存在 -->";
+		}
+	}, $content);
+
+	return $content;
+}
+
 ?>
