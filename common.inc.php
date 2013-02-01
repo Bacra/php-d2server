@@ -1,6 +1,6 @@
 <?php
 // 三个目录形式 
-// dir path file
+// dir redir path file
 
 // 设置时区
 date_default_timezone_set("PRC");
@@ -19,18 +19,18 @@ define('DOMAINROOT', 'w:/');
 
 
 // 注意：相对的是域名根目录
-define('LESSPATH', '//www.test.com:3316/Less/less-1.3.3.js');
+define('LESSFILE', '//www.test.com:3316/Less/less-1.3.3.js');
 // 配置文件相对HTML根目录的相对路径
 // 修改此参数之后，注意修改build文件中的ROOT目录
 define('CONFIGPATH', '.source/.buildconfig');
 define('PARAMPATH', '.temp/.paramconfig');
-define('COOKIENAME4HTMLPATH', 'WFHTMLPATH');
+define('COOKIENAME4HTMLDIR', 'WFHTMLDIR');
 
 
-define('SOURCEDIR', '.source/');		// 存放开发文件的目录
-define('BUILDDIR', '.temp/.build/');			// 存放生成文件的目录
-define('MODULEDIR', '.temp/.module/');	// 存放生成文件时临时导出文件的目录
-define('CACHEHTMLDIR', '.temp/.HTML/');
+define('SOURCE_REDIR', '.source/');		// 存放开发文件的目录
+define('BUILD_REDIR', '.temp/.build/');			// 存放生成文件的目录
+define('MODULE_REDIR', '.temp/.module/');	// 存放生成文件时临时导出文件的目录
+define('CACHEHTML_REDIR', '.temp/.HTML/');
 
 
 
@@ -421,7 +421,7 @@ function modelHTML($str, $partParam){
 
 function template($content, $path){
 	$content = preg_replace_callback('/<template +file=("|\')([^"\'>]+)\1 *\/>/i', function($matches) use($path){
-		$filePath = $path.SOURCEDIR.trim($matches[2]);
+		$filePath = $path.SOURCE_REDIR.trim($matches[2]);
 		if (file_exists($filePath)) {
 			return template(file_get_contents($filePath), $path);
 		} else {

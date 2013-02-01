@@ -31,7 +31,7 @@ switch ($extension) {
 header("Content-Type:$type;charset=$charset");
 
 
-define('HTMLPATH', isset($_COOKIE[COOKIENAME4HTMLPATH]) ? $_COOKIE[COOKIENAME4HTMLPATH] : DOMAINROOT);
+define('HTMLPATH', isset($_COOKIE[COOKIENAME4HTMLDIR]) ? $_COOKIE[COOKIENAME4HTMLDIR] : DOMAINROOT);
 define('PARAMFILE', HTMLPATH.PARAMPATH);
 
 
@@ -99,7 +99,7 @@ if (file_exists(PARAMFILE)) {
 } else {
 	echo "/**********************************\n".
 		"PARAMFILE 文件不存在\n".
-		"COOKIE：".(isset($_COOKIE[COOKIENAME4HTMLPATH]) ? $_COOKIE[COOKIENAME4HTMLPATH] : 'undefined')."\n".
+		"COOKIE：".(isset($_COOKIE[COOKIENAME4HTMLDIR]) ? $_COOKIE[COOKIENAME4HTMLDIR] : 'undefined')."\n".
 		"**********************************/\n";
 }
 

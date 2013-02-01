@@ -3,7 +3,7 @@ require dirname(dirname(__FILE__)).'/common.inc.php';
 
 define('CONFIGFILE', $argv[1]);
 define('ROOT', dirname(dirname(CONFIGFILE)).'/');
-define('SOURCEDIR2', ROOT.SOURCEDIR);
+define('SOURCEDIR', ROOT.SOURCE_REDIR);
 
 
 
@@ -19,22 +19,22 @@ if (file_exists(CONFIGFILE)) {
 
 
 if (is_array($config)) {
-	foreach ($config['files'] AS $outputFile => $inputFiles) {
+	foreach ($config['files'] AS $outputPath => $inputPaths) {
 		$arr = array();			// 用来存放需要合并的文件
 		
-		foreach ($inputFiles AS $inputFile) {
-			if (is_array($inputFile)) {
-				$arr = array_merge($arr, getValidInputfiles($inputFile));
+		foreach ($inputPaths AS $inputPath) {
+			if (is_array($inputPath)) {
+				$arr = array_merge($arr, getValidInputfiles($inputPath));
 			} else {
-				$rs = getValidInputfiles(array($inputFile));
+				$rs = getValidInputfiles(array($inputPath));
 				$arr[] = $rs[0];
 			}
 		}
 
 		// 压缩文件和未压缩文件存放目录设置
-		$targetFile = ROOT.$outputFile;					// 目标文件 未压缩的
+		$targetFile = ROOT.$outputPath;					// 目标文件 未压缩的
 		// 将文件转移到正式目录下
-		$compressFile = ROOT.BUILDDIR.$outputFile;		// 可能会被压缩的
+		$compressFile = ROOT.BUILD_REDIR.$outputPath;		// 可能会被压缩的
 		makeDirs($targetFile);
 		makeDirs($compressFile);
 
@@ -52,7 +52,7 @@ if (is_array($config)) {
 		}
 
 		
-		$outputPathinfo = pathinfo($outputFile);
+		$outputPathinfo = pathinfo($outputPath);
 		
 		// 判断是否需要压缩
 		if (stripos($outputPathinfo['basename'], '.min.') === false) {
@@ -97,7 +97,7 @@ if (is_array($config)) {
 				// ."		=============================\n"
 				."	如遇需求变更 请联系前端协调修改\n"
 				."	E-mail:wf@tianqu.com.cn   QQ:434537707\n"
-				// ."	File:$outputFile\n"
+				// ."	File:$outputPath\n"
 				// ."	Update:".TIME."\n"
 				."***********************************************/\n"
 				.$fileContent;
@@ -132,6 +132,9 @@ if ($warnMsgNum || $errorMsgNum) {
 
 
 
+function synchFile($outputPath, $source){
+
+}
 
 
 
@@ -139,18 +142,18 @@ if ($warnMsgNum || $errorMsgNum) {
 
 // 获取有效的 文件目录
 // 期间也会对less文件进行编译操作
-function getValidInputfiles($inputFiles) {
+function getValidInputfiles($inputPaths) {
 	$arr = array();
 	
-	foreach($inputFiles AS $filepath) {
+	foreach($inputPaths AS $filepath) {
 		$pathinfo = pathinfo($filepath);
 		$type = $pathinfo['extension'];
-		$inputFile = SOURCEDIR2.$filepath;
+		$inputFile = SOURCEDIR.$filepath;
 
 		if (file_exists($inputFile)) {
 			if ($type == 'less') {
 				// 编译less文件
-				$outputFile = ROOT.MODULEDIR.$pathinfo['dirname'].'/'.$pathinfo['filename'].'.css';
+				$outputFile = ROOT.MODULE_REDIR.$pathinfo['dirname'].'/'.$pathinfo['filename'].'.css';
 				makeDirs($outputFile);
 
 				// 判断文件是否存在 并且是最新的

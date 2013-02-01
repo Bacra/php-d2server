@@ -12,8 +12,8 @@ define('CONFIGFILE', HTMLDIR.CONFIGPATH);
 define('PARAMFILE', HTMLDIR.PARAMPATH);
 define('HTMLPART', isset($_GET['part']) ? $_GET['part'] : false);
 
-if (!isset($_COOKIE[COOKIENAME4HTMLPATH])){
-	setcookie(COOKIENAME4HTMLPATH, HTMLDIR, time() + 24*3600*30, "/".dirname($_GET['file']));
+if (!isset($_COOKIE[COOKIENAME4HTMLDIR])){
+	setcookie(COOKIENAME4HTMLDIR, HTMLDIR, time() + 24*3600*30, "/".dirname($_GET['file']));
 }
 
 if (file_exists(PARAMFILE)) {
@@ -32,7 +32,8 @@ if (file_exists(PARAMFILE)) {
 
 $pathinfo = pathinfo(HTMLFILE);
 $action = $_GET['action'];
-define('CACHEHTMLFILE', HTMLDIR.CACHEHTMLDIR.$pathinfo['filename'].'-4-'.HTMLPART.'.'.$pathinfo['extension']);
+define('CACHEHTMLFILE', HTMLDIR.CACHEHTML_REDIR.$pathinfo['filename'].'-4-'.HTMLPART.'.'.$pathinfo['extension']);
+
 
 if (file_exists(HTMLFILE)) {
 	$refresh = strpos($action, 'r') === false ? false : true;
@@ -76,7 +77,12 @@ if (file_exists(HTMLFILE)) {
 
 
 // js css less 地址转化
-$config = @include(CONFIGFILE);
+if (file_exists(CONFIGFILE)) {
+	$config = include(CONFIGFILE);
+} else {
+	return;
+}
+
 
 $hasLESS = false;
 if (is_array($config)) {
@@ -89,12 +95,12 @@ if (is_array($config)) {
 	// var_dump($config);
 
 	// 遍历配置文件
-	foreach ($config['files'] AS $outputFile => $inputFiles) {
-		$_paramconfig[$outputFile] = $inputFiles;
+	foreach ($config['files'] AS $outputPath => $inputPaths) {
+		$_paramconfig[$outputPath] = $inputPaths;
 		// 获取文件文件类型
-		$outputPathinfo = pathinfo($outputFile);
+		$outputPathinfo = pathinfo($outputPath);
 		$outputType = $outputPathinfo['extension'];
-		$preg = preg_encode($outputFile);
+		$preg = preg_encode($outputPath);
 
 		// echo $outputType;
 		if ($outputType == 'js') {
@@ -104,24 +110,24 @@ if (is_array($config)) {
 		}
 		// preg_match_all($preg, $content, $m);
 		// var_export($m);
-		$content = preg_replace_callback($preg, function($matches) use ($inputFiles, $outputPathinfo, &$_paramconfig){
+		$content = preg_replace_callback($preg, function($matches) use ($inputPaths, $outputPathinfo, &$_paramconfig){
 			// var_dump($matches);
 			$printArr = array();
-			foreach($inputFiles AS $key => $inputFile) {
+			foreach($inputPaths AS $key => $inputPath) {
 				
 				// 文件集合，需要合并到一个文件中
-				if (is_array($inputFile)) {
+				if (is_array($inputPath)) {
 					$myfiles = array();
 
 					$sourcePathinfo = pathinfo($key);
 					$sourceType = $sourcePathinfo['extension'];
 
-					foreach($inputFile AS $val) {
-						$filedir = HTMLDIR.SOURCEDIR.$val;
+					foreach($inputPath AS $val) {
+						$filedir = HTMLDIR.SOURCE_REDIR.$val;
 
 						// 判断文件是否存在
 						if (!file_exists($filedir)) {
-							$printArr[] = "\n\n<!-- [Convert ERROR] $inputFile 文件丢失 无法引入 -->\n\n";
+							$printArr[] = "\n\n<!-- [Convert ERROR] $inputPath 文件丢失 无法引入 -->\n\n";
 							continue;
 						}
 
@@ -129,7 +135,7 @@ if (is_array($config)) {
 						if ($sourceType == 'css') {
 							$myPathinfo = pathinfo($val);
 							if ($myPathinfo['extension'] == 'less') {
-								$cssfile = HTMLDIR.MODULEDIR.$myPathinfo['dirname'].'/'.$myPathinfo['filename'].'.css';
+								$cssfile = HTMLDIR.MODULE_REDIR.$myPathinfo['dirname'].'/'.$myPathinfo['filename'].'.css';
 
 								if (tempLess($filedir, $cssfile)) $myfiles[] = $cssfile;
 								continue;
@@ -147,20 +153,20 @@ if (is_array($config)) {
 					// }
 					// $urlfiles = implode('&', $urlfiles);
 					
-					$inputFile = $key;
+					$inputPath = $key;
 
 				// 单独一个文件
 				} else {
-					$myfiles = HTMLDIR.SOURCEDIR.$inputFile;
+					$myfiles = HTMLDIR.SOURCE_REDIR.$inputPath;
 					// 如果文件不存在，就不添加
 					// less如果文件不存在继续引入，会报错
 					if (!file_exists($myfiles)) {
-						$printArr[] = "\n\n<!-- [Convert ERROR] $inputFile 文件丢失 无法引入 -->\n\n";
+						$printArr[] = "\n\n<!-- [Convert ERROR] $inputPath 文件丢失 无法引入 -->\n\n";
 						continue;
 					}
 
 					
-					$sourcePathinfo = pathinfo($inputFile);
+					$sourcePathinfo = pathinfo($inputPath);
 					$sourceType = $sourcePathinfo['extension'];
 					
 					// $urlfiles = 'files[]='.urlencode($filedir);
@@ -168,7 +174,7 @@ if (is_array($config)) {
 
 
 
-				$fullPath = dirname($_GET['file']).'/'.$inputFile;
+				$fullPath = dirname($_GET['file']).'/'.$inputPath;
 				if (isset($_paramconfig['path'][$fullPath])) {
 					$index = $_paramconfig['path'][$fullPath];
 					$_paramconfig['files'][] = $myfiles;
@@ -218,7 +224,7 @@ if (is_array($config)) {
 
 
 	// 如果使用了LESS，就在head里面添加less处理文件
-	$content = str_replace('</head>', '<script type="text/javascript" src="'.LESSPATH.'"></script>'."\r\n".'</head>', $content);
+	$content = str_replace('</head>', '<script type="text/javascript" src="'.LESSFILE.'"></script>'."\r\n".'</head>', $content);
 
 	// 添加说明文字
 	$content = str_replace('<head>', "<head>\n<!-- UPDATA BY ".CONFIGPATH." -->\n<!-- MTIME ".date('l dS \of F Y h:i:s A', @filemtime(HTMLFILE)).(HTMLNOCACHE ? " -->\n<!-- NOW ".date('l dS \of F Y h:i:s A', TIME) : '').' -->'
@@ -231,7 +237,7 @@ file_put_contents(PARAMFILE, "<?php\nreturn ".var_export($_paramconfig, true).";
 
 // 输出内容
 // 不管是否存在config，都要输入出内容
-ob_clean();
+// ob_clean();
 echo $content;
 
 // 创建缓存
