@@ -3,10 +3,10 @@ require dirname(__FILE__).'/common.inc.php';
 
 // require './common.inc.php';
 
-// »ñÈ¡ÎÄ¼şÀàĞÍ ²¢ÉèÖÃ±àÂë
+// è·å–æ–‡ä»¶ç±»å‹ å¹¶è®¾ç½®ç¼–ç 
 $charset = isset($_GET['charset']) ? strtolower($_GET['charset']) : 'utf-8';
 
-// ÉèÖÃÊı¾İÀàĞÍ
+// è®¾ç½®æ•°æ®ç±»å‹
 $extension = isset($_GET['extension']) ? $_GET['extension'] : 'js';
 
 switch ($extension) {
@@ -41,21 +41,21 @@ if (file_exists(PARAMFILE)) {
 	if (isset($_GET['pathid']) && isset($_paramconfig['files'][$_GET['pathid']])) {
 
 		/******************************
-			¶ÁÈ¡ÏàÓ¦µÄ×ÊÔ´ÎÄ¼ş
-			±ãÓÚÄ¿Â¼µÄÎ±¾²Ì¬´¦Àí
+			è¯»å–ç›¸åº”çš„èµ„æºæ–‡ä»¶
+			ä¾¿äºç›®å½•çš„ä¼ªé™æ€å¤„ç†
 		 ******************************/
 
 		header( 'Expires: -1' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
-		header( 'Pragma: no-cache' ); //¼æÈİhttp1.0ºÍhttps
+		header( 'Pragma: no-cache' ); //å…¼å®¹http1.0å’Œhttps
 
 
 		$dealFiles = $_paramconfig['files'][$_GET['pathid']];
 
 
-		// ¶ÁÈ¡ÎÄ¼şÄÚÈİ
+		// è¯»å–æ–‡ä»¶å†…å®¹
 
 		$filePathArr = array();
 		$fileContent = '';
@@ -66,7 +66,7 @@ if (file_exists(PARAMFILE)) {
 				loadFile($file, $fileContent, $filePathArr, $errorFileArr, true);
 			}
 
-			// Êä³öÍ·²¿ĞÅÏ¢
+			// è¾“å‡ºå¤´éƒ¨ä¿¡æ¯
 			echo "/**********************************\n\n".
 				"	Now: ".date('l dS \of F Y h:i:s A', time())."\n";
 
@@ -87,19 +87,19 @@ if (file_exists(PARAMFILE)) {
 			echo "\n**********************************/\n";
 		}
 
-		// Êä³öÎÄ¼şÄÚÈİ
+		// è¾“å‡ºæ–‡ä»¶å†…å®¹
 		echo $fileContent;
 	} else {
 		echo "/**********************************\n".
-		"²ÎÊı´íÎó\n".
-		"pathid£º{$_GET['pathid']}\n".
-		"files£º{$_paramconfig['files']}\n".
+		"å‚æ•°é”™è¯¯\n".
+		"pathidï¼š{$_GET['pathid']}\n".
+		"filesï¼š{$_paramconfig['files']}\n".
 		"**********************************/\n";
 	}
 } else {
 	echo "/**********************************\n".
-		"PARAMFILE ÎÄ¼ş²»´æÔÚ\n".
-		"COOKIE£º".(isset($_COOKIE[COOKIENAME4HTMLDIR]) ? $_COOKIE[COOKIENAME4HTMLDIR] : 'undefined')."\n".
+		"PARAMFILE æ–‡ä»¶ä¸å­˜åœ¨\n".
+		"COOKIEï¼š".(isset($_COOKIE[COOKIENAME4HTMLDIR]) ? $_COOKIE[COOKIENAME4HTMLDIR] : 'undefined')."\n".
 		"**********************************/\n";
 }
 
@@ -142,7 +142,7 @@ function loadFile($file, &$fileContent, &$filePathArr, &$errorFileArr, $showFile
 }
 
 /**
- * ¶ÁÈ¡ÎÄ¼şÄÚÈİ£¬²¢Éú³ÉÊäÈëÄ£°æ
+ * è¯»å–æ–‡ä»¶å†…å®¹ï¼Œå¹¶ç”Ÿæˆè¾“å…¥æ¨¡ç‰ˆ
  * @param  [type] $file     [description]
  * @param  [type] $filepath [description]
  * @return [type]           [description]
@@ -163,14 +163,14 @@ function fileContentTpl($file, $filepath = false) {
 		}, $content);
 
 
-		// LESS°üº¬baseLessÎÄ¼ş
+		// LESSåŒ…å«baseLessæ–‡ä»¶
 		if ($extension == 'less') {
 			includeLess($file, $content);
 		}
 	}
 
 
-	// ÊÇ·ñÒªÉú³ÉÕâÒ»¶Î×¢ÊÍ£¨µ¥¸öÎÄ¼şµÄ»°£¬²»ĞèÒª£©
+	// æ˜¯å¦è¦ç”Ÿæˆè¿™ä¸€æ®µæ³¨é‡Šï¼ˆå•ä¸ªæ–‡ä»¶çš„è¯ï¼Œä¸éœ€è¦ï¼‰
 	if ($filepath) {
 		$str = "\n\n\n\n\n\n\n\n\n\n\n\n".
 				"/**********************************\n\n".
