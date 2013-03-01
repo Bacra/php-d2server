@@ -37,53 +37,23 @@ class TemplateNodeBuilder {
 		$i = 0;
 		$omits = array();
 		while($node = $nodes -> item($i++)) {
-			
-			// 当变量没有定义的时候，采用的默认值
-			// 注意：必须是变量，不能是常量
-			// 设置的时候，作用域为括号内
-			self::defineVar($node, 'tq:default');
-			// 直接定义变量
-			self::defineVar($node, 'tq:define');
-
-			// 修改属性值
-			// 修改属性方式：= 直接替换或则赋值；+= 增加属性； -=删除属性
-			// 判断条件的介入：不使用表达式，可以直接设置PHP变量，来实现attr的改变
-			// self::doAttribute($node, 'tq:attr', function($node, $attrVal){});
-			
-
-			// 模块化
+			// 定义模块化
 			self::doAttribute($node, 'tq:init-omit', function($node, $attrVal) use (&$omits){
-				$omits[$attrVal] = $node;
-			});
-			self::doAttribute($node, 'tq:use-omit', function($node, $attrVal){
-				$node -> nodeValue = '{tq:omit '.$attrVal.'}';
-			});
-
-			// 判断是否需要删除此标签
-			self::doAttribute($node, 'tq:block', function($node, $attrVal){
-				TemplateNodeBuilder::wrapNode($node, new DOMText('{tq:block '.$attrVal.'}'), new DOMText('{/tq:block}'));
+				$omits[$attrVal] = $node -> C14N();
 			});
 			
-			// 设置重复次数
-			self::doAttribute($node, 'tq:repeat', function($node, $attrVal){
-				TemplateNodeBuilder::wrapNode($node, new DOMText('{tq:repeat '.$attrVal.'}'), new DOMText('{/tq:repeat}'));
-			});
-
-			// 替换标签内内容
-			self::doAttribute($node, 'tq:replace', function($node, $attrVal){
-				$node -> nodeValue = $attrVal;
-			});
-
-
-			if ($node -> hasAttribute('tq:label')) {
-				self::noWrapNode($node);
-				$i--;	// -1非常重要
-			}
+			self::parseNode($node, $i);
 		}
 
-		foreach ($omits AS $key => $val) {
-			$this -> omit[$key] = $val -> C14N();
-		}
+		$this -> omit = $omits;
+		// var_dump($omits);
+
+		// foreach ($omits AS $key => $val) {
+		// 	$doc4omit = new DOMDocument();
+		// 	$doc4omit->loadHTML($str);
+		// 	$this -> omit[$key] = $val -> C14N();
+		// 	// echo $this -> omit[$key];
+		// }
 		$this -> body = $doc->saveHTML();
 	}
 
@@ -169,6 +139,47 @@ class TemplateNodeBuilder {
 					}
 				}
 			});
+	}
+
+	private static function parseNode($node, &$index){
+		// 当变量没有定义的时候，采用的默认值
+		// 注意：必须是变量，不能是常量
+		// 设置的时候，作用域为括号内
+		self::defineVar($node, 'tq:default');
+		// 直接定义变量
+		self::defineVar($node, 'tq:define');
+
+		// 修改属性值
+		// 修改属性方式：= 直接替换或则赋值；+= 增加属性； -=删除属性
+		// 判断条件的介入：不使用表达式，可以直接设置PHP变量，来实现attr的改变
+		// self::doAttribute($node, 'tq:attr', function($node, $attrVal){});
+		
+		// 判断是否需要删除此标签
+		self::doAttribute($node, 'tq:block', function($node, $attrVal){
+			TemplateNodeBuilder::wrapNode($node, new DOMText('{tq:block '.$attrVal.'}'), new DOMText('{/tq:block}'));
+		});
+
+		// 使用模块化
+		self::doAttribute($node, 'tq:use-omit', function($node, $attrVal){
+			$node -> nodeValue = '{tq:omit '.$attrVal.'}';
+		});
+
+		
+		// 设置重复次数
+		self::doAttribute($node, 'tq:repeat', function($node, $attrVal){
+			TemplateNodeBuilder::wrapNode($node, new DOMText('{tq:repeat '.$attrVal.'}'), new DOMText('{/tq:repeat}'));
+		});
+
+		// 替换标签内内容
+		self::doAttribute($node, 'tq:replace', function($node, $attrVal){
+			$node -> nodeValue = $attrVal;
+		});
+
+
+		if ($node -> hasAttribute('tq:label')) {
+			self::noWrapNode($node);
+			$index--;	// -1非常重要
+		}
 	}
 }
 
