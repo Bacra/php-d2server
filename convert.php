@@ -30,6 +30,7 @@ if (file_exists(PARAMFILE)) {
 // var_dump($_SERVER['REDIRECT_URL']);
 // 文件缓存机制
 // 注意：只缓存最后的结果，单单修改html或则修改config，都会导致脱离文件缓存机制
+
 $action = $_GET['action'];
 define('CACHEHTMLFILE', HTMLDIR.CACHEHTML_REDIR.basename(HTMLFILE));
 define('PARSESOURSE', strpos($action, 'o') === false);		// 是否需要转化加载的资源文件
@@ -232,5 +233,6 @@ file_put_contents(CACHEHTMLFILE, $content);
 // 输出内容
 // 不管是否存在config，都要输入出内容
 // ob_clean();
+
 include CACHEHTMLFILE;
 ?>

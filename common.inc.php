@@ -53,5 +53,6 @@ define('HTMLALLLESS', false);		// 将所有的css全部转化为LESS进行加载
 define('TIME', time());
 
 
+
 require 'common.func.php';
 ?>
