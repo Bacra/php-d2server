@@ -68,14 +68,17 @@ class TemplateNodeBuilder {
 
 			
 			// 设置重复次数
-			self::doAttribute($node, 'tq:repeat', function($node, $attrVal){
+			self::doAttribute($node, 'tq:loop', function($node, $attrVal){
 				$varName = TemplateNodeBuilder::createUniqueVarName();
-				$node -> wrap(new DOMText('{tq:repeat '.$attrVal.' '.$varName.'}'), new DOMText('{/tq:repeat '.$varName.'}'));
+				$node -> wrap(new DOMText('{tq:loop '.$attrVal.' '.$varName.'}'), new DOMText('{/tq:loop '.$varName.'}'));
 			});
 
 			// 替换标签内内容
-			self::doAttribute($node, 'tq:replace', function($node, $attrVal){
-				$node -> text('{tq:echo '.$attrVal.'}');
+			self::doAttribute($node, 'tq:text', function($node, $attrVal){
+				$node -> text('{tq:text '.$attrVal.'}');
+			});
+			self::doAttribute($node, 'tq:html', function($node, $attrVal){
+				$node -> text('{tq:html '.$attrVal.'}');
 			});
 
 
@@ -298,10 +301,11 @@ class TemplateHTML {
 		$str = preg_replace('/{tq:block +([^}]+)}/', '<?php if (!'.self::$HTMLPartParam.' || preg_match(\'/\b\'.'.self::$HTMLPartParam.'.\'\b/\', "$1")): ?>', $str);
 		$str = preg_replace('/{\/tq:block}/i', '<?php endif; ?>', $str);
 
-		$str = preg_replace('/{tq:repeat +([^ ]+) ([^}]+)}/', '<?php foreach(range(1, "$1") AS $2): ?>', $str);
-		$str = preg_replace('/{\/tq:repeat +([^}]+)}/', '<?php endforeach; unset($1)?>', $str);
+		$str = preg_replace('/{tq:loop +([^ ]+) ([^}]+)}/', '<?php foreach(range(1, "$1") AS $2): ?>', $str);
+		$str = preg_replace('/{\/tq:loop +([^}]+)}/', '<?php endforeach; unset($1)?>', $str);
 
-		$str = preg_replace ( '/{tq:echo +([^}]+)}/', '<?php echo "$1";?>', $str);
+		$str = preg_replace ( '/{tq:text +([^}]+)}/', '<?php echo "$1";?>', $str);
+		$str = preg_replace ( '/{tq:html +([^}]+)}/', '<?php echo htmlspecialchars_decode("$1");?>', $str);
 
 		$str = preg_replace('/{tq:default +([^ ]+) +([^ ]+) ([^}]+)}/', '<?php if (!isset($2)): $2 = "$3"; $1 = true; endif; ?>', $str);
 		$str = preg_replace('/{tq:defaultEnd ([^ ]+) ([^}]+)}/', '<?php if (isset($1)): unset($2); endif; ?>', $str);
