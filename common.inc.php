@@ -36,6 +36,8 @@ define('NOCACHE', true);					// 不使用缓存（每次都编译模版生成缓
 define('HTML_REDIR', '.source/HTML/');
 define('CACHEHTML_REDIR', '.temp/.HTML/');
 
+define('NOPROJECT', true);					// 当不是项目时，是否显示HTML源码
+
 
 
 // 压缩文件的配置
