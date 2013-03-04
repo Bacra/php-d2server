@@ -8,7 +8,8 @@ class TemplateNodeBuilder {
 
 	function __construct($str){
 		$doc = new DOMDocument();
-		$doc->loadHTML($str);
+		DEBUG ? $doc->loadHTML($str) : @$doc->loadHTML($str);
+		
 		// 编码问题
 		/*$nodes = $doc -> getElementsByTagName('meta');
 		$i = 0;

@@ -5,6 +5,8 @@
 // 设置时区
 date_default_timezone_set("PRC");
 
+define('DEBUG', false);		// 受到影响的内容有：模版解析时最初的HTML parse
+
 
 // 外部调用程序及JAR路径
 define('JAVA', 'JAVA');
