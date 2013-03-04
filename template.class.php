@@ -37,23 +37,60 @@ class TemplateNodeBuilder {
 		$i = 0;
 		$omits = array();
 		while($node = $nodes -> item($i++)) {
+			$node = new TemplateNode($node);
+
 			// 定义模块化
 			self::doAttribute($node, 'tq:init-omit', function($node, $attrVal) use (&$omits){
-				$omits[$attrVal] = $node -> C14N();
+				$omits[$attrVal] = $node;
 			});
 			
-			self::parseNode($node, $i);
+			// 当变量没有定义的时候，采用的默认值
+			// 注意：必须是变量，不能是常量
+			// 设置的时候，作用域为括号内
+			self::defineVar($node, 'tq:default');
+			// 直接定义变量
+			self::defineVar($node, 'tq:define');
+
+			// 修改属性值
+			// 修改属性方式：= 直接替换或则赋值；+= 增加属性； -=删除属性
+			// 判断条件的介入：不使用表达式，可以直接设置PHP变量，来实现attr的改变
+			// self::doAttribute($node, 'tq:attr', function($node, $attrVal){});
+			
+			// 判断是否需要删除此标签
+			self::doAttribute($node, 'tq:block', function($node, $attrVal){
+				$node -> wrap(new DOMText('{tq:block '.$attrVal.'}'), new DOMText('{/tq:block}'));
+			});
+
+			// 使用模块化
+			self::doAttribute($node, 'tq:use-omit', function($node, $attrVal){
+				$node -> text('{tq:omit '.$attrVal.'}');
+			});
+
+			
+			// 设置重复次数
+			self::doAttribute($node, 'tq:repeat', function($node, $attrVal){
+				$varName = TemplateNodeBuilder::createUniqueVarName();
+				$node -> wrap(new DOMText('{tq:repeat '.$attrVal.' '.$varName.'}'), new DOMText('{/tq:repeat '.$varName.'}'));
+			});
+
+			// 替换标签内内容
+			self::doAttribute($node, 'tq:replace', function($node, $attrVal){
+				$node -> text($attrVal);
+			});
+
+
+			if ($node -> node -> hasAttribute('tq:label')) {
+				$node -> removeWrap();
+				$i--;	// -1非常重要
+			}
 		}
 
-		$this -> omit = $omits;
+		// $this -> omit = $omits;
 		// var_dump($omits);
 
-		// foreach ($omits AS $key => $val) {
-		// 	$doc4omit = new DOMDocument();
-		// 	$doc4omit->loadHTML($str);
-		// 	$this -> omit[$key] = $val -> C14N();
-		// 	// echo $this -> omit[$key];
-		// }
+		foreach ($omits AS $key => $val) {
+			$this -> omit[$key] = $val -> html();
+		}
 		$this -> body = $doc->saveHTML();
 	}
 
@@ -78,38 +115,11 @@ class TemplateNodeBuilder {
 
 
 
-	// 在node前后插入新的node
-	public static function wrapNode($refNode, $beforeNode, $afterNode, $outerMode=true) {
-		if ($outerMode) {
-			$refNode->parentNode->insertBefore($beforeNode, $refNode);
-			
-			if($refNode->nextSibling) {
-				$refNode->parentNode->insertBefore($afterNode, $refNode->nextSibling);
-			} else {
-				$refNode->parentNode->appendChild($afterNode);
-			}
-		} else if ($refNode -> hasChildNodes()){
-			$refNode -> insertBefore($beforeNode, $refNode -> firstChild);
-			$refNode -> appendChild($afterNode);
-		}
-	}
-
-	// 将外层的node（自己）去掉
-	// 注意：会保留里面的内容
-	public static function noWrapNode($node){
-		if ($node -> hasChildNodes()) {
-			while ($myNode = $node -> childNodes-> item(0)) {
-				$node -> parentNode -> insertBefore($myNode, $node);
-			}
-		}
-		$node -> parentNode -> removeChild($node);
-	}
-
 	// 处理标签中属性的一般流程封装
 	public static function doAttribute($node, $attrName, $callback){
-		if ($node -> hasAttribute($attrName)) {
-			$attrVal = trim($node -> getAttribute($attrName));
-			$node -> removeAttribute($attrName);
+		if ($node -> node -> hasAttribute($attrName)) {
+			$attrVal = trim($node -> node -> getAttribute($attrName));
+			$node -> node -> removeAttribute($attrName);
 			if ($attrVal) {
 				$callback($node, $attrVal);
 			}
@@ -133,53 +143,12 @@ class TemplateNodeBuilder {
 							$val[1] = trim($val[1]);
 							if ($val[0] && $val[1]) {
 								$varName = TemplateNodeBuilder::createUniqueVarName();
-								TemplateNodeBuilder::wrapNode($node, new DOMText('{'.$attrName.' '.$varName.' '.$val[0].' '.$val[1].'}'), new DOMText('{'.$attrName.'End '.$varName.' '.$val[0].'}'));
+								$node -> wrap(new DOMText('{'.$attrName.' '.$varName.' '.$val[0].' '.$val[1].'}'), new DOMText('{'.$attrName.'End '.$varName.' '.$val[0].'}'));
 							}
 						}
 					}
 				}
 			});
-	}
-
-	private static function parseNode($node, &$index){
-		// 当变量没有定义的时候，采用的默认值
-		// 注意：必须是变量，不能是常量
-		// 设置的时候，作用域为括号内
-		self::defineVar($node, 'tq:default');
-		// 直接定义变量
-		self::defineVar($node, 'tq:define');
-
-		// 修改属性值
-		// 修改属性方式：= 直接替换或则赋值；+= 增加属性； -=删除属性
-		// 判断条件的介入：不使用表达式，可以直接设置PHP变量，来实现attr的改变
-		// self::doAttribute($node, 'tq:attr', function($node, $attrVal){});
-		
-		// 判断是否需要删除此标签
-		self::doAttribute($node, 'tq:block', function($node, $attrVal){
-			TemplateNodeBuilder::wrapNode($node, new DOMText('{tq:block '.$attrVal.'}'), new DOMText('{/tq:block}'));
-		});
-
-		// 使用模块化
-		self::doAttribute($node, 'tq:use-omit', function($node, $attrVal){
-			$node -> nodeValue = '{tq:omit '.$attrVal.'}';
-		});
-
-		
-		// 设置重复次数
-		self::doAttribute($node, 'tq:repeat', function($node, $attrVal){
-			TemplateNodeBuilder::wrapNode($node, new DOMText('{tq:repeat '.$attrVal.'}'), new DOMText('{/tq:repeat}'));
-		});
-
-		// 替换标签内内容
-		self::doAttribute($node, 'tq:replace', function($node, $attrVal){
-			$node -> nodeValue = $attrVal;
-		});
-
-
-		if ($node -> hasAttribute('tq:label')) {
-			self::noWrapNode($node);
-			$index--;	// -1非常重要
-		}
 	}
 }
 
@@ -187,7 +156,7 @@ class TemplateNodeBuilder {
  * 在使用DOM处理模版前，对文件字符串进行转义
  * 作用：修正编码和不可用的标签
  */
-class TemplateNode extends TemplateNodeBuilder {
+class TemplateNodeFileBuilder extends TemplateNodeBuilder {
 	private $filePath = '';
 
 	function __construct($file){
@@ -221,6 +190,83 @@ class TemplateNode extends TemplateNodeBuilder {
 }
 
 
+class TemplateNode {
+	public $node;
+	private $afterNode;
+	private $beforeNode;
+
+	function __construct($node) {
+		$this -> afterNode = array();
+		$this -> beforeNode = array();
+		$this -> node = $node;
+	}
+
+	public function after($node) {
+		if ($this -> node -> nextSibling) {
+			$this -> node -> parentNode -> insertBefore($node, $this -> node -> nextSibling);
+		} else {
+			$this -> node -> parentNode -> appendChild($node);
+		}
+
+		array_unshift($this -> afterNode, $node);
+	}
+
+	public function before($node) {
+		$this -> node -> parentNode -> insertBefore($node, $this -> node);
+
+		$this -> beforeNode[] = $node;
+	}
+
+
+	public function text($val = false) {
+		if ($val === false) return $this -> node -> nodeValue;
+
+		$this -> node -> nodeValue = $val;
+	}
+
+	public function html($node = false) {
+		if ($node === false) {
+			$content = '';
+			foreach ($this -> beforeNode AS $val) {
+				$content .= $val -> C14N();
+			}
+			$content .= $this -> node -> C14N();
+			foreach($this -> afterNode AS $val) {
+				$content .= $val -> C14N();
+			}
+			return $content;
+		}
+
+
+		$this -> text('');
+		$this -> node -> appendChild($node);
+	}
+
+	public function wrap($beforeNode, $afterNode) {
+		$this -> before($beforeNode);
+		$this -> after($afterNode);
+	}
+
+	public function wrapInner($beforeNode, $afterNode) {
+		if ($refNode -> hasChildNodes()) {
+			$this -> node -> insertBefore($beforeNode, $this -> node -> firstChild);
+		} else {
+			$this -> node -> appendChild($beforeNode);
+		}
+		$this -> node -> appendChild($afterNode);
+	}
+
+	public function removeWrap() {
+		if ($this -> node -> hasChildNodes()) {
+			while ($myNode = $this -> node -> childNodes-> item(0)) {
+				$this -> before($myNode);
+			}
+		}
+		$this -> node -> parentNode -> removeChild($this -> node);
+	}
+}
+
+
 
 
 
@@ -246,21 +292,21 @@ class TemplateHTML {
 			$str = file_get_contents($file);
 		}
 
-		$this -> filePath = $file;
+		$this -> filePath = $file;			// 用来保存处理的当前文件信息
 
 		// tq命名空间下的代码转换
-		$str = preg_replace('/{tq:block ([^}]+)}/', '<?php if (!'.self::$HTMLPartParam.' || preg_match(\'/\b\'.'.self::$HTMLPartParam.'.\'\b/\', "$1")): ?>', $str);
+		$str = preg_replace('/{tq:block +([^}]+)}/', '<?php if (!'.self::$HTMLPartParam.' || preg_match(\'/\b\'.'.self::$HTMLPartParam.'.\'\b/\', "$1")): ?>', $str);
 		$str = preg_replace('/{\/tq:block}/i', '<?php endif; ?>', $str);
 
-		$str = preg_replace('/{tq:repeat ([^}]+)}/', '<?php foreach(range(1, "$1") AS $tq2111111100): ?>', $str);
-		$str = preg_replace('/{\/tq:repeat}/', '<?php endforeach; ?>', $str);
+		$str = preg_replace('/{tq:repeat +([^ ]+) ([^}]+)}/', '<?php foreach(range(1, "$1") AS $2): ?>', $str);
+		$str = preg_replace('/{\/tq:repeat +([^}]+)}/', '<?php endforeach; unset($1)?>', $str);
 
-		$str = preg_replace('/{tq:default ([^ ]+) +([^ ]+) ([^}]+)}/', '<?php if (!isset($2)): $2 = "$3"; $1 = true; endif; ?>', $str);
+		$str = preg_replace('/{tq:default +([^ ]+) +([^ ]+) ([^}]+)}/', '<?php if (!isset($2)): $2 = "$3"; $1 = true; endif; ?>', $str);
 		$str = preg_replace('/{tq:defaultEnd ([^ ]+) ([^}]+)}/', '<?php if (isset($1)): unset($2); endif; ?>', $str);
 
-		$str = preg_replace('/{tq:define ([^ ]+) +([^ ]+) ([^}]+)}/', '<?php if (isset($2)): $1 = $2; endif; $2 = "$3"; ?>', $str);
+		$str = preg_replace('/{tq:define +([^ ]+) +([^ ]+) ([^}]+)}/', '<?php if (isset($2)): $1 = $2; endif; $2 = "$3"; ?>', $str);
 		$str = preg_replace('/{tq:defineEnd ([^ ]+) ([^}]+)}/', '<?php if (isset($1)): $2 = $1; else: unset($2); endif; ?>', $str);
-		$str = preg_replace_callback('/{tq:omit ([^}]+)}/', function($matchs)  use ($file){
+		$str = preg_replace_callback('/{tq:omit +([^}]+)}/', function($matchs)  use ($file){
 			if (strpos($matchs[1], '#') !== false) {
 				$var = explode('#', $matchs[1]);
 				return '<?php include parseOmit("'.HTMLDIR.str_replace('[PATH]', HTML_REDIR, $var[0]).'", "'.$var[1].'"); ?>';
@@ -322,7 +368,7 @@ class TemplateParser {
 			return self::$cache4node[$file];
 		}
 
-		$ob = new TemplateNode($file);
+		$ob = new TemplateNodeFileBuilder($file);
 		self::$cache4node[$file] = $ob;
 		return $ob;
 	}
@@ -338,7 +384,11 @@ class TemplateParser {
 		}
 		
 		$str = $ob -> getResult();
-		self::$cache4html[$key] = $str;		// 值$str保存了也没啥用
+
+		// 出现莫明的&#xD;值
+		$str = str_replace('&#xD;', '', $str);
+		
+		self::$cache4html[$key] = $str;
 		return $str;
 	}
 
@@ -406,10 +456,9 @@ function parseOmit($file, $omit){
 			}
 			$ob = TemplateParser::getNode($file);
 			if (!$ob -> hasOmit($omit)) exit($omit . ' Not Find In '. $file);
-			$content = TemplateParser::parse4HTML($file, $omit);
-			
-			// 出现莫名的'&#xD;'
-			return str_replace('&#xD;', '', $content);
+			return TemplateParser::parse4HTML($file, $omit);
+		} else {
+			return TemplateParser::getHTML($tplFile);
 		}
 	}, $omit);
 }
