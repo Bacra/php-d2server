@@ -300,7 +300,7 @@ class TemplateHTML {
 
 		$str = preg_replace('/{tq:repeat +([^ ]+) ([^}]+)}/', '<?php foreach(range(1, "$1") AS $2): ?>', $str);
 		$str = preg_replace('/{\/tq:repeat +([^}]+)}/', '<?php endforeach; unset($1)?>', $str);
-		
+
 		$str = preg_replace ( '/{tq:echo +([^}]+)}/', '<?php echo "$1";?>', $str);
 
 		$str = preg_replace('/{tq:default +([^ ]+) +([^ ]+) ([^}]+)}/', '<?php if (!isset($2)): $2 = "$3"; $1 = true; endif; ?>', $str);
@@ -427,7 +427,9 @@ class CacheTemplate {
 	}
 	static public function save($tplFile, $content) {
 		makeDirs($tplFile);
-		return file_put_contents($tplFile, $content);
+		$str = file_put_contents($tplFile, $content);
+		clearstatcache(true, $tplFile);
+		return $str;
 	}
 	static public function update($file, $getContentCallback, $omit = '') {
 		$tplFile = self::getCachePath($file, $omit);
