@@ -75,7 +75,7 @@ class TemplateNodeBuilder {
 
 			// 替换标签内内容
 			self::doAttribute($node, 'tq:replace', function($node, $attrVal){
-				$node -> text($attrVal);
+				$node -> text('{tq:echo '.$attrVal.'}');
 			});
 
 
@@ -300,6 +300,8 @@ class TemplateHTML {
 
 		$str = preg_replace('/{tq:repeat +([^ ]+) ([^}]+)}/', '<?php foreach(range(1, "$1") AS $2): ?>', $str);
 		$str = preg_replace('/{\/tq:repeat +([^}]+)}/', '<?php endforeach; unset($1)?>', $str);
+		
+		$str = preg_replace ( '/{tq:echo +([^}]+)}/', '<?php echo "$1";?>', $str);
 
 		$str = preg_replace('/{tq:default +([^ ]+) +([^ ]+) ([^}]+)}/', '<?php if (!isset($2)): $2 = "$3"; $1 = true; endif; ?>', $str);
 		$str = preg_replace('/{tq:defaultEnd ([^ ]+) ([^}]+)}/', '<?php if (isset($1)): unset($2); endif; ?>', $str);
@@ -330,6 +332,7 @@ class TemplateHTML {
 		}, $str);
 		$str = preg_replace('/{else}/i', '<? else: ?>', $str);
 		$str = preg_replace('/{\/if}/i', '<? endif; ?>', $str);
+		$str = preg_replace ( '/{(\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)}/', '<?php echo $1;?>', $str);
 
 		$this -> result = $str;
 	}
@@ -387,7 +390,7 @@ class TemplateParser {
 
 		// 出现莫明的&#xD;值
 		$str = str_replace('&#xD;', '', $str);
-		
+
 		self::$cache4html[$key] = $str;
 		return $str;
 	}
