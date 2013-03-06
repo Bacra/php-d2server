@@ -1,28 +1,29 @@
 {
-	"name": "Create HTML By PHP",
+	"name": "WebProject Environment",
 	"version": "1.0",
-	"description": "快速切换成http://127.0.0.1本地Apache模式",
-	"background": { "scripts": ["background.js"] },
-	"page_action" :
-	{
-		"default_icon" : "icon-19.png",
-		"default_title" : "运行服务器模式"
-		//"default_title" : "运行服务器模式",
-		//"default_popup": "popup.html"
+	"description": "Support for WebProject Environment",
+	"background": { "scripts": ["js/background.js"] },
+	"page_action" : {
+		"default_icon" : "icon/icon-19.png",
+		"default_title" : "show setting for website"
 	},
 	"permissions" : [
-		"tabs"
+		"tabs",
+		"http://*/*",
+		"https://*/*",
+		"notifications"
 	],
 	"icons" : {
-		"48" : "icon-48.png",
-		"128" : "icon-128.png"
+		"19": "icon/icon-19.png",
+		"48" : "icon/icon-48.png",
+		"128" : "icon/icon-128.png"
 	},
 	"content_scripts" : [
 		{
 			"matches" : [
 				"*://127.0.0.1/*"
 			],
-			"js" : ["contentscript.js"],
+			"js" : ["js/contentscript.js"],
 			"all_frames" : true
 		}
 	],

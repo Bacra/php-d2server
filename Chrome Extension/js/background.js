@@ -2,6 +2,10 @@
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 	if (tab.url.indexOf('file://') > -1) {
 		chrome.pageAction.show(tabId);
+		chrome.pageAction.setTitle({
+			'tabId': tabId,
+			'title': 'Catch me to localhost'
+		});
 	}
 });
 
