@@ -34,7 +34,7 @@ define('SOURCE_REDIR', '.source/');		// 存放开发文件的目录
 define('BUILD_REDIR', '.temp/.build/');			// 存放生成文件的目录
 define('MODULE_REDIR', '.temp/.module/');	// 存放生成文件时临时导出文件的目录
 
-define('NOCACHE', true);					// 不使用缓存（每次都编译模版生成缓存）
+define('NOCACHE', false);					// 不使用缓存（每次都编译模版生成缓存）
 define('HTML_REDIR', '.source/HTML/');
 define('CACHEHTML_REDIR', '.temp/.HTML/');
 
