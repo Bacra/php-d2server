@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8" />
+</head>
+<script type="text/javascript">
+var  wsServer = 'ws://127.0.0.1:8080/'; 
+var  websocket = new WebSocket(wsServer); 
+websocket.onopen = function (evt) { 
+	console.log("Connected to WebSocket server.");
+}; 
+websocket.onclose = function (evt) { 
+	console.log("Disconnected");
+};
+websocket.onmessage = function (evt) { 
+	console.log('Retrieved data from server: ' + evt.data);
+};
+websocket.onerror = function (evt) { 
+	console.log('Error occured: ' + evt.data);
+};
+</script>
+<body>
+	<input type="button" onclick="websocket.send('D:/node/');" value="监视根目录" />
+	<input type="button" onclick="websocket.send('D:/node/22/');" value="监视子目录" />
+	<input type="button" onclick="websocket.send('D:/node/00.txt');" value="监视文件" />
+	<input type="button" onclick="websocket.send('D:/node');" value="测试去掉/的目录" />
+</body>
+</html>

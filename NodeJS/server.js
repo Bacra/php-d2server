@@ -1,6 +1,5 @@
 // node D:\node\test
 var fs = require('fs');
-var http = require('http');
 var ui = require('url');
 var ws = require('websocket.io');
 var watchFiles = {};
@@ -9,26 +8,26 @@ var clients = [];
 var intervalSend = 400;
 
 
-var server = http.createServer(function(req, res){ 
-	res.writeHead(200,{ 'Content-Type': 'text/html' }); 
-	res.end('<h1>Hello Socket!</h1>');
-});
-server.listen(8080);
 
 //创建socket
-var socket = ws.listen(server);
+var socket = ws.listen(8080);
+console.log('== WebSocket Start ==');
+
 socket.on('connection', function(client){
+	client.id = clients.push([]);
+	console.log('[Connect] Client'+client.id);
+
 	client.on('message',function(data){
-		console.log('[Received]', data);
+		console.log('[Received] ', data);
 		if (data) addWatch(data, client);
 	});
 
-	client.on('disconnect',function(){
-		var filenames = clients[clients.id - 1];
+	client.on('close',function(){
+		var filenames = clients[client.id - 1];
 		for (var i = filenames.length; i--;) {
 			popArray(client, filenames[i]);
 		}
-		console.log('[Disconnect]' + client.id);
+		console.log('[Disconnect] Client' + client.id);
 	});
 });
 
@@ -120,11 +119,7 @@ function addWatchFile(file, client) {		// 虽然fs.watch可以直接监视目录
 
 function addClient(client, path) {
 	watchFiles[path].push(client);
-	if (client.id) {
-		clients[client.id - 1].push(path);
-	} else {
-		client.id = clients.push([path]);
-	}
+	clients[client.id - 1].push(path);
 }
 
 
