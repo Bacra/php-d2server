@@ -71,6 +71,8 @@ function addWatch(path, client) {		// 添加的入口
 }
 
 function addWatchPath(path, client) {
+	if (path.indexOf('/.temp') != -1 || path.indexOf('/.git') != -1) return;
+	
 	fs.readdir(path, function(err, paths) {
 		// files为目录里的文件及子目录（不包含子目录里的内容）
 		if (err) {
@@ -98,6 +100,8 @@ function addWatchPath(path, client) {
 }
 
 function addWatchFile(file, client) {		// 虽然fs.watch可以直接监视目录，但为了后期判断维护方便，全部通过遍历来实现添加文件
+	if (file.indexOf('.gitignore') != -1) return;
+	
 	watchFiles[file] = [client];
 	fs.watch(file, function(e, filename) {
 		if (filename && e) {
