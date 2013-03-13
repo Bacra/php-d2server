@@ -11,8 +11,16 @@ var _WS_SetTimeout4less = false,
 	_WS_Interval = 1000,
 	_WS = new WebSocket('ws://www.test.com:8080/');
 
-_WS.onopen = function (evt) {
+_WS.addEventListener('open', function (evt) {
 	console.log("Contact WebSocket Server");
+
+	_WS.addEventListener('close', function(evt){
+		chrome.extension.sendMessage({
+			'cmd': 'websocketShutDown'
+		});
+	});
+
+
 	var path = window.location.pathname;
 	_WS.send('D:/Projects' + path.substr(0, path.lastIndexOf('/')+1));
 
@@ -20,16 +28,9 @@ _WS.onopen = function (evt) {
 		'cmd': 'setPageAction',
 		'status': 'conn-success'
 	});
-};
-_WS.onclose = function (evt) {
-	console.log("Discontacte WebSocket Server");
+});
 
-	chrome.extension.sendMessage({
-		'cmd': 'setPageAction',
-		'status': 'conn-close'
-	});
-};
-_WS.onmessage = function (evt) {
+_WS.addEventListener('message', function (evt) {
 	var json = JSON.parse(evt.data);
 	if (json.filename.indexOf('.less') != -1) {
 		if (!_WS_SetTimeout4less) {
@@ -58,12 +59,23 @@ _WS.onmessage = function (evt) {
 			}, _WS_Interval);
 		}
 	}
-};
-_WS.onerror = function (evt) { 
-	console.log('WebSocket Error occured: ' + evt.data);
+});
 
+_WS.addEventListener('error', function (evt) { 
+	console.log('WebSocket Error occured: ' + evt.data);
+	chrome.extension.sendMessage({
+		'cmd': 'websocketError'
+	});
+});
+
+
+_WS.addEventListener('close', function (evt) {
+	console.log("Discontacte WebSocket Server");
 	chrome.extension.sendMessage({
 		'cmd': 'setPageAction',
-		'status': 'conn-error'
+		'status': 'conn-close'
 	});
-};
+	chrome.extension.sendMessage({
+		'cmd': 'joinWebsocketWaitQuery'
+	});
+});

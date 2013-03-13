@@ -1,3 +1,27 @@
+var _WebsocketWaitQuery = {
+	'list': [],
+	'add': function(tabId) {
+		this.list.push(tabId);
+	},
+	'remove': function(tabId) {
+		var index = this.index(tabId);
+		if (index != -1) this.list.splice(index, 1);
+	},
+	'index': function(tabId) {
+		for (var i = this.list.length; i--;) {
+			if (tabId == this.list[i]) return i;
+		}
+		return -1;
+	},
+	'reload': function() {
+		var arr = this.list.slice();		// 复制一份，防止出现同步问题
+		for(var i = arr.length; i--;) {
+			chrome.tabs.reload(arr[i]);
+		}
+	}
+};
+
+
 // 监视url
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 	if (tab.url.indexOf('file://') > -1) {
@@ -19,14 +43,14 @@ chrome.pageAction.onClicked.addListener(function(tab){
 	if (url.indexOf('file://') > -1){
 		chrome.tabs.update(tab.id, {'url': 'http://www.test.com/' + url.substr(11)});
 	} else {
-		chrome.tabs.update(tab.id, {'url': url.replace(/#.*/g, '') + '#!watch'});
+		_WebsocketWaitQuery.reload();
 	}
 });
 
 
-
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	var sendTabId = sender.tab.id;
+	
 	switch(request.cmd) {
 		case 'reload':
 			chrome.tabs.reload(sendTabId);
@@ -37,16 +61,12 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 			var title, icon;
 			switch(request.status) {
 				case 'catchPage':
-					title = 'Catch this Page';
-					icon = 'ws-conn';
+					title = 'Just Catch this Page';
+					icon = 'icon';
 					break;
 				case 'conn-success':
 					title = 'Contact WebSocket Server';
-					icon = 'ws-norm';
-					break;
-				case 'conn-error':
-					title = 'Discontact WebSocket Server';
-					icon = 'ws-error';
+					icon = 'ws-conn';
 					break;
 				case 'conn-close':
 					title = 'WebSocket Server Closed';
@@ -62,6 +82,33 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 				'path': '../icon/'+icon+'-19.png'
 			});
 			break;
+		case 'websocketShutDown':
+		case 'websocketError':
+			var myTime = new Date(),
+				notification = webkitNotifications.createNotification("", "与WebSocket Server断开 ", "WebSocket Server已经退出，重启之后请点击此对话框刷新相关页面（"+ myTime.getHours() + ":" + myTime.getMinutes() + ":" + myTime.getSeconds()+"）");
+
+			notification.onclick = function(){
+				_WebsocketWaitQuery.reload();
+				notification.cancel();
+				notification = null;
+			};
+
+			notification.replaceId = 'webProjectBG_serverError';
+			notification.show();
+			break;
+		case 'joinWebsocketWaitQuery':
+			_WebsocketWaitQuery.add(sendTabId);
+			break;
+
 	}
 	sendResponse(null);
+});
+
+
+// 监听update事件
+chrome.tabs.onUpdated.addListener(function(tabId){
+	_WebsocketWaitQuery.remove(tabId);
+});
+chrome.tabs.onRemoved.addListener(function(tabId){
+	_WebsocketWaitQuery.remove(tabId);
 });
