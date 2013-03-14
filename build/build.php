@@ -112,8 +112,8 @@ $warnMsgNum = count($warnMsg);
 $errorMsgNum = count($errorMsg);
 
 if ($warnMsgNum || $errorMsgNum) {
-	if ($warnMsgNum) echo "[Warn]\n".implode("\n", $warnMsg);
-	if ($errorMsgNum) echo "[Error]\n".implode("\n", $errorMsg);
+	if ($warnMsgNum) echo mb_convert_encoding("[Warn]\n".implode("\n", $warnMsg), "GB2312", "UTF-8");
+	if ($errorMsgNum) echo mb_convert_encoding("[Error]\n".implode("\n", $errorMsg), "GB2312", "UTF-8");
 	echo "\n";
 }
 
