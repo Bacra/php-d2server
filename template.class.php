@@ -287,7 +287,12 @@ class TemplateNode {
  * 将smart语法解析成可执行代码
  */
 class TemplateHTML {
-	private static $HTMLPartParam = 'HTMLPART';		// 定义$htmlpart变量的变量名（也可以是常量）
+	public static $HTMLPartParam = 'HTMLPART';		// 定义$htmlpart变量的变量名（也可以是常量）
+	public static $HTMLDirParam = 'HTMLDIR';
+	public static $HTMLRedirParam = 'HTML_REDIR';
+	public static $HTMLRedirMarker = '[PATH]';
+	public static $HTMLRedirMarkerLength = 6;
+
 	private $result = '';
 	private $filePath = '';
 
@@ -316,7 +321,12 @@ class TemplateHTML {
 		$str = preg_replace_callback('/{tq:omit +([^}]+)}/', function($matchs)  use ($file){
 			if (strpos($matchs[1], '#') !== false) {
 				$var = explode('#', $matchs[1]);
-				return '<?php include parseOmit("'.HTMLDIR.str_replace('[PATH]', HTML_REDIR, $var[0]).'", "'.$var[1].'"); ?>';
+				if (strpos($var[0], TemplateHTML::$HTMLRedirMarker) === 0) {
+					$filePath = TemplateHTML::$HTMLRedirParam.'."'.substr($var[0], TemplateHTML::$HTMLRedirMarkerLength).'"';
+				} else {
+					$filePath = '"'.$var[0].'"';
+				}
+				return '<?php include parseOmit('.TemplateHTML::$HTMLDirParam.'.'.$filePath.', "'.$var[1].'"); ?>';
 			} else {
 				return '<?php include parseOmit("'.$file.'", "'.$matchs[1].'"); ?>';
 			}
@@ -462,7 +472,9 @@ function parseOmit($file, $omit){
 	return CacheTemplate::update($file, function($file, $tplFile, $omit){
 		if (!TemplateParser::hasHTML($tplFile)) {
 			if (!TemplateParser::hasNode($file)) {
-				parseTemplate($file);
+				// parseTemplate($file);
+				// 不能使用parseTemplate，必须强制去解析模版 否则会造成getNode函数抛错
+				TemplateParser::parse($file);
 			}
 			$ob = TemplateParser::getNode($file);
 			if (!$ob -> hasOmit($omit)) exit($omit . ' Not Find In '. $file);
