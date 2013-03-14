@@ -1,25 +1,48 @@
 var _WebsocketWaitQuery = {
-	'list': [],
-	'add': function(tabId) {
-		this.list.push(tabId);
-	},
-	'remove': function(tabId) {
-		var index = this.index(tabId);
-		if (index != -1) this.list.splice(index, 1);
-	},
-	'index': function(tabId) {
-		for (var i = this.list.length; i--;) {
-			if (tabId == this.list[i]) return i;
+		'list': [],
+		'add': function(tabId) {
+			this.list.push(tabId);
+		},
+		'remove': function(tabId) {
+			var index = this.index(tabId);
+			if (index != -1) this.list.splice(index, 1);
+		},
+		'index': function(tabId) {
+			for (var i = this.list.length; i--;) {
+				if (tabId == this.list[i]) return i;
+			}
+			return -1;
+		},
+		'map': function(callback) {
+			var arr = this.list.slice();		// 复制一份，防止出现同步问题
+			for(var i = arr.length; i--;) {
+				callback(arr[i]);
+			}
+		},
+		'reload': function() {
+			this.map(function(tabId){
+				chrome.tabs.reload(tabId);
+			});
+		},
+		'sendMsg': function(msg) {
+			this.map(function(tabId){
+				chrome.tabs.sendMessage(tabId, msg);
+			});
 		}
-		return -1;
 	},
-	'reload': function() {
-		var arr = this.list.slice();		// 复制一份，防止出现同步问题
-		for(var i = arr.length; i--;) {
-			chrome.tabs.reload(arr[i]);
-		}
-	}
-};
+	contactWebkSocket = function() {
+		_WebsocketWaitQuery.map(function(tabId){
+			chrome.pageAction.setTitle({
+				'tabId': tabId,
+				'title': 'Contact WebSocket Server...'
+			});
+			chrome.pageAction.setIcon({
+				'tabId': tabId,
+				'path': '../icon/icon-19.png'
+			});
+		});
+		_WebsocketWaitQuery.sendMsg({'cmd': 'initWebSocket'});
+	};
 
 
 // 监视url
@@ -88,7 +111,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 				notification = webkitNotifications.createNotification("", "与WebSocket Server断开 ", "WebSocket Server已经退出，重启之后请点击此对话框刷新相关页面（"+ myTime.getHours() + ":" + myTime.getMinutes() + ":" + myTime.getSeconds()+"）");
 
 			notification.onclick = function(){
-				_WebsocketWaitQuery.reload();
+				contactWebkSocket();
 				notification.cancel();
 				notification = null;
 			};

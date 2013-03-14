@@ -1,13 +1,16 @@
 // node D:\node\test
-var fs = require('fs');
-var ui = require('url');
-var ws = require('websocket.io');
+var fs = require('fs'),
+	ui = require('url'),
+	ws = require('websocket.io'),
+	wsPort = 8384;
+
+
 
 
 
 //创建socket
-var socket = ws.listen(8080);
-console.log('== WebSocket Start ==');
+var socket = ws.listen(wsPort);
+console.log('== WebSocket Start:'+wsPort+' ==');
 
 socket.on('connection', function(client){
 	client.id = addWatch.watchClients.push([]);
@@ -95,7 +98,12 @@ addWatch.addFile = function(file, client) {		// 虽然fs.watch可以直接监视
 			if (!addWatch.fileStatus[file]) {		// 等待缓存
 				addWatch.fileStatus[file] = true;
 
-				addWatch.broadcastMsg('{"file": "'+file+'", "filename": "'+filename+'", "event": "'+e+'"}', addWatch.watchFiles[file]);
+				addWatch.broadcastMsg({
+					'cmd': 'fileEvent',
+					'file': file,
+					'filename': filename,
+					'event': e
+				}, addWatch.watchFiles[file]);
 
 				console.log('=> ' + file + '['+e+']');
 
@@ -116,14 +124,16 @@ addWatch.addClient = function(client, file) {
 
 addWatch.broadcastMsg = function(msg, clis) {
 	for (var i = clis.length; i--;) {
-		clis[i].send(msg);
+		clis[i].send(JSON.stringify(msg));
 	}
+	addWatch.broadcastMsgList.push(msg);
 };
 
 addWatch.fileStatus = {};		// 缓存文件状态（可能一次文件保存操作会出发几次事件）
 addWatch.watchFiles = {};
 addWatch.watchClients = [];
 addWatch.intervalSend = 400;
+addWatch.broadcastMsgList = [];
 
 
 
