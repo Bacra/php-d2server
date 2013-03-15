@@ -1,4 +1,4 @@
-var _WebsocketWaitQuery = {
+var _WebsocketQuery = {
 		'list': [],
 		'add': function(tabId) {
 			this.list.push(tabId);
@@ -31,7 +31,7 @@ var _WebsocketWaitQuery = {
 		}
 	},
 	contactWebkSocket = function() {
-		_WebsocketWaitQuery.map(function(tabId){
+		_WebsocketQuery.map(function(tabId){
 			chrome.pageAction.setTitle({
 				'tabId': tabId,
 				'title': 'Contact WebSocket Server...'
@@ -41,7 +41,7 @@ var _WebsocketWaitQuery = {
 				'path': '../icon/icon-19.png'
 			});
 		});
-		_WebsocketWaitQuery.sendMsg({'cmd': 'initWebSocket'});
+		_WebsocketQuery.sendMsg({'cmd': 'initWebSocket'});
 	};
 
 
@@ -66,7 +66,7 @@ chrome.pageAction.onClicked.addListener(function(tab){
 	if (url.indexOf('file://') > -1){
 		chrome.tabs.update(tab.id, {'url': 'http://www.test.com/' + url.substr(11)});
 	} else {
-		_WebsocketWaitQuery.reload();
+		_WebsocketQuery.reload();
 	}
 });
 
@@ -119,8 +119,8 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 			notification.replaceId = 'webProjectBG_serverError';
 			notification.show();
 			break;
-		case 'joinWebsocketWaitQuery':
-			_WebsocketWaitQuery.add(sendTabId);
+		case 'joinWebsocketQuery':
+			if (_WebsocketQuery.index(sendTabId) == -1) _WebsocketQuery.add(sendTabId);
 			break;
 
 	}
@@ -130,8 +130,8 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
 // 监听update事件
 chrome.tabs.onUpdated.addListener(function(tabId){
-	_WebsocketWaitQuery.remove(tabId);
+	_WebsocketQuery.remove(tabId);
 });
 chrome.tabs.onRemoved.addListener(function(tabId){
-	_WebsocketWaitQuery.remove(tabId);
+	_WebsocketQuery.remove(tabId);
 });

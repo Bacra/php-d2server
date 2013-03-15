@@ -11,20 +11,48 @@ var _WS_SetTimeout4less = false,
 	_WS_Interval = 1000,
 	_WS,
 	initWebSocket = (function(){
-		_WS = new WebSocket('ws://www.test.com:8384/');
+		_WS = new WebSocket('ws://www.test.com:8080/');
 
 		_WS.addEventListener('open', function (evt) {
-			insertScript('less.watchMode = false;');
+			// 关闭less自动解析模版功能
+			insertScript('if (window.less) window.less.watchMode = false;');
+			
+			// 绑定附加的close事件
 			_WS.addEventListener('close', function(evt){
-				insertScript('less.watchMode = true;');
+				insertScript('if (window.less) window.less.watchMode = true;');
 				chrome.extension.sendMessage({
 					'cmd': 'websocketShutDown'
 				});
 			});
 
 
-			var path = window.location.pathname;
-			_WS.send('D:/Projects' + path.substr(0, path.lastIndexOf('/')+1));
+
+			// 发送绑定目录的数据
+			var file = 'D:/Projects' + window.location.pathname;
+			_WS.send(JSON.stringify({
+				'cmd': 'watchFiles',
+				'files': [file],
+				'paths': [{
+					'path': file.substring(0, file.lastIndexOf('/') + 1),
+					'ignore': [
+						'faces/*',
+						'.temp/*',
+						'.gitignore',
+						'.git/*',
+						'regexp:' + /^[^\/]+$/.toString()
+					]
+				}]
+			}));
+
+
+			// 仅在纠错时，进行这一部分的赋值
+			/*_WS.send(JSON.stringify({
+				'cmd': 'setClientInfo',
+				'info': {
+					'title': document.getElementsByTagName('title')[0].text,
+					'url': window.location.href
+				}
+			}));*/
 
 
 			console.log("Contact WebSocket Server");
@@ -36,6 +64,7 @@ var _WS_SetTimeout4less = false,
 
 		_WS.addEventListener('message', function (evt) {
 			var data = JSON.parse(evt.data);
+			console.log('WebSocket Server onMessage', data);
 
 			switch (data.cmd) {
 				case 'fileEvent':
@@ -43,7 +72,7 @@ var _WS_SetTimeout4less = false,
 						if (!_WS_SetTimeout4less) {
 							_WS_SetTimeout4less = true;
 							
-							insertScript('window.less.watchFN();');
+							insertScript('if (window.less) window.less.watchFN();');
 
 							setTimeout(function(){
 								_WS_SetTimeout4less = false;
@@ -82,9 +111,6 @@ var _WS_SetTimeout4less = false,
 				'cmd': 'setPageAction',
 				'status': 'conn-close'
 			});
-			chrome.extension.sendMessage({
-				'cmd': 'joinWebsocketWaitQuery'
-			});
 		});
 
 
@@ -97,7 +123,9 @@ var _WS_SetTimeout4less = false,
 		};
 	})();
 
-
+chrome.extension.sendMessage({
+	'cmd': 'joinWebsocketQuery'
+});
 
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	switch(request.cmd) {

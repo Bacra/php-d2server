@@ -21,7 +21,6 @@
 	"content_scripts" : [
 		{
 			"matches" : [
-				"*://127.0.0.1/*",
 				"*://www.test.com/*"
 			],
 			"js" : ["js/contentscript.js"],
