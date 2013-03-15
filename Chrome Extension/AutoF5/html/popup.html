@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link type="text/css" rel="stylesheet" href="../css/popup.css" />
+<script type="text/javascript" src="../js/jquery-1.7.1.min.js"></script>
+
+<script>
+var win = chrome.extension.getBackgroundPage();
+
+
+
+// Object for loading
+var loading_;
+
+
+function loading() {
+  this.timerId_ = 0;
+  this.maxCount_ = 8;  // Total number of states in animation
+  this.current_ = 0;  // Current state
+  this.maxDot_ = 4;  // Max number of dots in animation
+  this.$box = $('.loading');
+  this.bgOn = '<img src="../image/jc_on.gif" />';
+  this.bgOff = '<img src="../image/jc_off.gif" />';
+};
+
+/**
+ * Paints the badge text area while loading the data.
+ */
+loading.prototype.paintFrame = function() {
+  var text = '';
+  for (var i = 0; i < this.maxDot_; i++) {
+    text += (i == this.current_) ? this.bgOn : this.bgOff;
+  }
+
+  this.$box.html(text);
+  this.current_++;
+  if (this.current_ == this.maxCount_) {
+    this.current_ = 0;
+  }
+};
+
+/**
+ * Starts the animation process.
+ */
+loading.prototype.start = function() {
+	if (this.timerId_) {
+		return;
+	}
+	
+	this.$box.show();
+	win.popupStatus.isLoading = true;
+	
+	var self = this;
+	this.timerId_ = window.setInterval(function() {
+		self.paintFrame();
+	}, 120);
+};
+
+/**
+ * Stops the animation process.
+ */
+loading.prototype.stop = function() {
+  if (!this.timerId_) {
+    return;
+  }
+  
+  
+  window.clearInterval(this.timerId_);
+  this.timerId_ = 0;
+  
+  win.popupStatus.isLoading = false;
+};
+
+
+$(function(){
+	loading_ = new loading();
+});
+
+//loading end
+
+
+
+
+
+
+var showTime = function(){
+	this.runTime = win.runTime;
+	this.$timeBox = $('.stayonline ul li:eq(1) span');
+	
+	this.int();
+}
+
+showTime.prototype.show = function (){	
+	var h,m,s,
+		str = '';
+	
+	
+	h = Math.floor(this.runTime/3600);
+	m = Math.floor(this.runTime%3600/60);
+	s = this.runTime%60;
+	
+	if (h) {str += h+'小时';}
+	if (m) {str += m+'分';}
+	if (s) {str += s+'秒';}
+	
+	this.$timeBox.html(str);
+}
+
+showTime.prototype.int = function(){
+	this.runTime++;
+	this.show();
+	
+	var self = this;
+	setInterval(function(){
+		self.runTime++;
+		self.show();
+	}, 1000);
+}
+
+
+
+
+$(function(){
+	//初始化状态
+	if (win.popupStatus.isLoading) {
+		loading_.start();
+	}
+	
+	
+	
+	
+	
+	if (!win.isSignIn) {
+		$('.signOut').show();
+		
+		if (localStorage['searchTicketUrl'].length < 10) {
+			$('.signOut ul li:eq(0)').hide();
+			$('.signOut ul li:eq(1)').css({
+				'border-radius': '4px'
+			});	
+		} else {
+			$('.signOut ul li:eq(0)').bind('click', function(){
+					if (loading_.timerId_) {
+						return;
+					}
+					
+					//请求backgoround进行登陆状态的检测
+					var portCheckSignStatus = chrome.extension.connect({name: 'portCheckSignStatus'});
+					portCheckSignStatus.postMessage({});
+					
+					loading_.start();
+					
+				})
+				.show();
+			$('.signOut ul li:eq(1)').css({
+				'border-radius': '0 4px 4px 0'
+			});
+			
+			
+			
+			//检查登陆状态的结果返回
+			chrome.extension.onConnect.addListener(function(port) {
+				if (port.name == "portCheckSignStatusResult") {
+					port.onMessage.addListener(function(msg) {
+						switch (msg.status) {
+							case 'signIn':
+								$('.signOut').hide();
+								$('.stayonline').show();
+								new showTime();
+								break;
+							case 'signOut':
+								$('.signOut > div:eq(1)').text('您尚未登陆12306');
+								break;
+							case 'error':
+								$('.signOut > div:eq(1)').text('无法连接 请检测网络是否畅通');
+								break;
+						}
+						
+						loading_.stop();
+					})
+				}
+			});
+		}
+		
+		//设置打开登录页面的事件
+		$('.signOut ul li:eq(1)').bind('click', function(){
+			chrome.tabs.create({url: win.domain+'/otsweb/'});
+		});
+	} else if (localStorage['searchTicketUrl'].length < 10){
+		$('noSearchTicketUrl').show();
+	} else {
+		new showTime();
+		loading_.start();
+	}
+	
+	
+	
+	//由于在检查在线状态的时候，可能会检查到已经在线的状况，需要直接显示票务信息，所以票务信息需要在有searchTicketUrl的情况下就进行时间绑定
+	if (localStorage['searchTicketUrl'].length > 10) {
+		//var port = chrome.extension.connect({name: "postData"});
+		
+	}
+	//showNotification();
+	//chrome.browserAction.setPopup({popup: 'view/popup.html'});
+
+
+
+
+
+});
+</script>
+
+</head>
+
+<body>
+	<div class="loading"></div>
+	<div class="signOut">
+		<div style="font-size:14px; padding:4px 4px 2px;">插件未检测到12306的页面活动信息</div>
+		<div style="font-size:16px; font-weight:bold; padding:8px 4px 12px; border-bottom:#999 1px dashed;">插件尚未启动</div>
+		<ul>
+			<li style="border-radius:4px 0 0 4px;">检查登录状态</li>
+			<li style="border-radius:0 4px 4px 0;">打开登录页面</li>
+		</ul>
+		<div class="clear"></div>
+	</div>
+	<div class="noSearchTicketUrl">
+		<p>打开12306车票预定页面 → 输入您要查询的车票信息 → 点击查询</p>
+		<p>手动完成第一次查询后 就可以在此处查看余票信息了</p>
+		<p style="font-size:14px; padding:8px; color:#666;">之后 系统会自动刷新查询页面和此处的余票信息</p>
+	</div>
+	<div class="noTrainsHasTicket">&quot; No Such Train Tickets &quot;</div>
+	<div class="hasTicketTrains">
+		<table>
+			<tr>
+				<th>车次</th>
+				<th>出发站</th>
+				<th>到达站</th>
+				<th>出发时间</th>
+				<th>到达时间</th>
+				<th>历时时间</th>
+				<th>预定</th>
+			</tr>
+			<tr>
+				<td rowspan="2">K1780</td>
+				<td>武昌</td>
+				<td>北京</td>
+				<td>12:12</td>
+				<td>14:33</td>
+				<td>77:23</td>
+				<td rowspan="2">Go!</td>
+			</tr>
+			<tr>
+				<td colspan="5">
+					硬座:12张 软卧:233张
+				</td>
+			</tr>
+			<tr>
+				<td rowspan="2">K1780</td>
+				<td>武昌</td>
+				<td>北京</td>
+				<td>12:12</td>
+				<td>14:33</td>
+				<td>77:23</td>
+				<td rowspan="2">Go!</td>
+			</tr>
+			<tr>
+				<td colspan="5">
+					硬座:12张 软卧:233张
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="stayonline">
+		<ul>
+			<li style="border-radius:4px 0 0 4px;" class="button checked">保持在线</li>
+			<li style="border-radius:0; color:#999;">已经在线 <span></span></li>
+			<li style="border-radius:0 4px 4px 0; margin:0;" class="button checked">拓展菜单</li>
+		</ul>
+		<div class="clear"></div>
+	</div>
+</body>
+</html>

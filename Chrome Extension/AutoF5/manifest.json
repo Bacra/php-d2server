@@ -1,5 +1,5 @@
 {
-	"name": "WebProject Environment",
+	"name": "AutoF5",
 	"version": "1.0",
 	"description": "Support for WebProject Environment",
 	"background": { "scripts": ["js/background.js"] },
