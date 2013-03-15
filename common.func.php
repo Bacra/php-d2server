@@ -28,7 +28,7 @@ function mkdirs($dirname) {
 
 
 function compressJS($inputFile, $outputFile){
-	$execCommand = JAVA.' -jar '.CLOSURECOMPILER.' --js "'.$inputFile.'" --js_output_file "'.$outputFile.'"';
+	$execCommand = JAVA.' -jar '.JSC.' --js "'.$inputFile.'" --js_output_file "'.$outputFile.'"';
 	$execCommand = str_replace('/', "\\", $execCommand);
 	@exec($execCommand, $return, $code);	
 
@@ -42,7 +42,7 @@ function compressJS($inputFile, $outputFile){
 
 
 function compressCss($inputFile, $outputFile){
-	$execCommand = JAVA.' -jar '.YUICOMPRESSOR.' "'.$inputFile.'" -o "'.$outputFile.'"';
+	$execCommand = JAVA.' -jar '.CSSC.' "'.$inputFile.'" -o "'.$outputFile.'"';
 	$execCommand = str_replace('/', "\\", $execCommand);
 	@exec($execCommand, $return, $code);	
 

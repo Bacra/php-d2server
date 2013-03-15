@@ -59,25 +59,7 @@ if (file_exists(PARAMFILE)) {
 		$filePathArr = array();
 		$fileContent = '';
 		$errorFileArr = array();
-
-		if (is_array($dealFiles)) {
-			foreach ($dealFiles AS $file) {
-				loadFile($file, $fileContent, $filePathArr, $errorFileArr, true);
-			}
-
-			// 输出头部信息
-			echo "/**********************************\n\n".
-				"	Now: ".date('l dS \of F Y h:i:s A', time())."\n";
-
-			if (count($filePathArr) > 0) {
-				echo "\n	[Success FilePath]\n".
-					"	".implode("\n	", $filePathArr)."\n";
-			}
-
-			echo "\n**********************************/\n";
-		} else {
-			loadFile($dealFiles, $fileContent, $filePathArr, $errorFileArr, false);
-		}
+		loadFile($dealFiles, $fileContent, $filePathArr, $errorFileArr, false);
 
 		if (count($errorFileArr) > 0) {
 			echo "/**********************************\n\n";

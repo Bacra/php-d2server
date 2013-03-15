@@ -449,7 +449,7 @@ class CacheTemplate {
 	static public function update($file, $getContentCallback, $omit = '') {
 		$tplFile = self::getCachePath($file, $omit);
 		// self::save($tplFile, $getContentCallback($file, $tplFile, $omit));
-		if (NOCACHE || !file_exists($tplFile) || filemtime($tplFile) < filemtime($file)) {
+		if (DEBUG || !file_exists($tplFile) || filemtime($tplFile) < filemtime($file)) {
 			self::save($tplFile, $getContentCallback($file, $tplFile, $omit));
 		}
 
