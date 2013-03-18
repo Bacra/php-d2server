@@ -11,6 +11,12 @@ if (!file_exists(CONFIGFILE)) exit('Config File not exits');
 $CONFIG = json_decode(file_get_contents(CONFIGFILE), true);
 
 
+if (isset($CONFIG['sync'])) {
+	$synch = new FileSyncher($CONFIG['sync']['path'], isset($CONFIG['sync']['exclude']) ? $CONFIG['sync']['exclude'] : false);
+} else {
+	$synch = false;
+}
+
 foreach ($CONFIG['files'] AS $outputPath => $inputPaths) {
 	// 压缩文件和未压缩文件存放目录设置
 	$targetFile = ROOT.$outputPath;					// 目标文件 未压缩的
@@ -33,7 +39,11 @@ foreach ($CONFIG['files'] AS $outputPath => $inputPaths) {
 	$str = '';
 	foreach ($inputPaths AS $inputPath) {
 		$rs = getValidInputfiles($inputPath);
-		if (!$rs) continue;
+		if (!$rs) {
+			Console::error("文件不存在 跳过");
+			Console::error("	$inputFile");
+			continue;
+		}
 		$str .= file_get_contents($rs)."\n\n";;
 	}
 
@@ -48,10 +58,12 @@ foreach ($CONFIG['files'] AS $outputPath => $inputPaths) {
 
 	$outputPathinfo = pathinfo($outputPath);
 	// 判断是否需要压缩
-	if (stripos($outputPathinfo['basename'], '.min.') === false) {
+	if (!preg_match('/\.min$/', $outputPathinfo['filename'])) {
 		copy($targetFile, $compressFile);
+		if ($synch) $synch -> synch($targetFile, $outputPath);
 		continue;
 	}
+
 
 	// 需要压缩的文件处理
 	// 先备份一份未压缩的到.build
@@ -59,6 +71,8 @@ foreach ($CONFIG['files'] AS $outputPath => $inputPaths) {
 
 	// 压缩文件
 	$outputType = $outputPathinfo['extension'];
+	if ($synch) $synch -> synch($targetFile, preg_replace('/\.min(?=\.'.$outputType.')/', '', $outputPath));		// 同步未压缩文件
+
 	if ($outputType == 'js') {
 		compressJS($targetFile, $compressFile);
 	} else if ($outputType == 'css') {
@@ -89,6 +103,8 @@ foreach ($CONFIG['files'] AS $outputPath => $inputPaths) {
 		Console::error("	$compressFile");
 		exit();
 	}
+
+	if ($synch) $synch -> synch($compressFile, $outputPath);
 }
 
 
@@ -105,7 +121,6 @@ if ($warnMsgNum || $errorMsgNum) {
 	if ($errorMsgNum) echo mb_convert_encoding("[Error]\n".implode("\n", $errorMsg), "GB2312", "UTF-8");
 	echo "\n";
 }
-
 // end
 
 
@@ -114,8 +129,53 @@ if ($warnMsgNum || $errorMsgNum) {
 
 
 // 使用到的函数
-function synchFile($outputPath, $source){
+class FileSyncher {
+	private $rules = array();
+	private $synchDir;
 
+	public function __construct($synchDir, $rules = false) {
+		$this -> synchDir = $synchDir;
+
+		if ($rules) {
+			foreach ($rules as $r) {
+				$this -> addRule($this -> toRegExp($r));
+			}
+		}
+	}
+
+	public function addRule($regexp) {
+		$this -> rules[] = $regexp;
+	}
+	public function toRegExp($rule) {
+		$rule = str_replace('.', '\\.', $rule);
+		$rule = str_replace('/', '\/', $rule);
+		$rule = str_replace('*', '.*', $rule);
+		$rule = str_replace('?', '.?', $rule);
+		return '/^'.$rule.'$/';
+	}
+	public function test($str) {
+		foreach ($this -> rules AS $r) {
+			if (preg_match($r, $str)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public function synch($fromFile, $fromPath) {
+		if ($this -> test($fromFile)) {
+			Console::log('文件因同步排除列表设置规则而被忽略');
+			Console::log('	'.$fromFile);
+			return false;
+		}
+
+
+		$toFile = $this -> synchDir . $fromPath;
+		makeDirs($toFile);
+		Console::log("copy from $fromFile to $toFile");
+		copy($fromFile, $toFile);
+
+		return true;
+	}
 }
 
 
@@ -124,11 +184,7 @@ function synchFile($outputPath, $source){
 // 期间也会对less文件进行编译操作
 function getValidInputfiles($filepath) {
 	$inputFile = SOURCEDIR.$filepath;
-	if (!file_exists($inputFile)) {
-		Console::error("文件不存在 跳过");
-		Console::error("	$inputFile");
-		return false;
-	}
+	if (!file_exists($inputFile)) return false;
 
 	$pathinfo = pathinfo($filepath);
 	$type = $pathinfo['extension'];
