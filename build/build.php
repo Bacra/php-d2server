@@ -25,14 +25,14 @@ foreach ($CONFIG['files'] AS $outputPath => $inputPaths) {
 
 	// 判断是否需要进行下面的操作
 	if (!DEBUG && file_exists($targetFile)) {
-		$noNeed = false;
+		$noBuild = true;
 		foreach ($inputPaths AS $inputPath) {
-			if (filemtime($targetFile) > filemtime(SOURCEDIR.$inputPath)) {
-				$noNeed = true;
+			if (filemtime($targetFile) < filemtime(SOURCEDIR.$inputPath)) {
+				$noBuild = false;
 				break;
 			}
 		}
-		if ($noNeed) continue;
+		if ($noBuild) continue;
 	}
 	
 	// 获取可用的文件地址，并读取文件合并内容

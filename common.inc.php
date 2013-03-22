@@ -5,7 +5,7 @@
 // 设置时区
 date_default_timezone_set("PRC");
 
-define('DEBUG', true);		// 受到影响的内容有：模版解析时最初的HTML parse => convert.php
+define('DEBUG', false);		// 受到影响的内容有：模版解析时最初的HTML parse => convert.php
 							// 不使用模版的缓存（每次都编译模版生成缓存）=> template.class.php
 							// 当不存在配置文件时，直接提示，而不是显示可能存在的html文件源码
 							// convert.php生成的HTML带有当前时间戳

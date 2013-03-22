@@ -122,9 +122,6 @@ foreach ($_CONFIG['files'] AS $outputPath => $inputPaths) {
 			// 获取文件命名
 			$sourceBasename = preg_replace('/\.[^\.]+$/', '.m'.$index.'$0', $sourcePathinfo['basename']);
 			$filePath = $outputPathinfo['dirname'].'/'.$sourceBasename;
-			
-			// 将css转为为less
-			if ($sourceType == 'css') $sourceType = 'less';
 
 
 			// 生成写入的字符串
