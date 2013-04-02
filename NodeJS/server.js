@@ -52,11 +52,8 @@ var fs = require('fs'),
 
 
 function watchFile4Socket(client, files, paths) {		// 添加的入口
-	var i;
-
-	// 先处理files中的内容（优先级比目录高）
-	for(i = files.length; i--;) {
-		;(function(){
+	var i,
+		myAddFile = function(i){
 			var file = files[i];
 			fs.exists(file, function(exists) {
 				if (!exists) {
@@ -65,11 +62,8 @@ function watchFile4Socket(client, files, paths) {		// 添加的入口
 				}
 				watchFile4Socket.addFile(client, file);
 			});
-		})();
-	}
-
-	for (i = paths.length; i--;) {
-		;(function(){
+		},
+		myAddPath = function(i){
 			var path = paths[i].path.replace('\\', '/'),
 				ignore = paths[i].ignore;
 			fs.exists(path, function(exists) {
@@ -86,7 +80,15 @@ function watchFile4Socket(client, files, paths) {		// 添加的入口
 
 				watchFile4Socket.addPath(client, path, path.length, new_ignore);
 			});
-		})();
+		};
+
+	// 先处理files中的内容（优先级比目录高）
+	for(i = files.length; i--;) {
+		myAddFile(i);
+	}
+
+	for (i = paths.length; i--;) {
+		myAddPath(i);
 	}
 }
 
@@ -98,32 +100,34 @@ watchFile4Socket.addPath = function(client, path, rootPathLength, ignore) {
 			return;
 		}
 
+		var addPath = function(i) {
+			var p = path+paths[i];
+			fs.stat(p, function (err, stats) {
+				if (err) {
+					console.error('[ERROR]'+p+' can not read');
+					return;
+				}
+
+				var isFile = stats.isFile();
+
+				if (!isFile) p += '/';
+
+				// 检查处理排除列表
+				if (watchFile4Socket.mapTest(p.substring(rootPathLength), ignore)) {
+					console.warn('[WARN] '+p+' ignore');
+					return;
+				}
+
+				if (isFile) {
+					watchFile4Socket.addFile(client, p);
+				} else {
+					watchFile4Socket.addPath(client, p, rootPathLength, ignore);
+				}
+			});
+		};
+
 		for (var i = paths.length; i--;) {
-			;(function(){
-				var p = path+paths[i];
-				fs.stat(p, function (err, stats) {
-					if (err) {
-						console.error('[ERROR]'+p+' can not read');
-						return;
-					}
-
-					var isFile = stats.isFile();
-
-					if (!isFile) p += '/';
-
-					// 检查处理排除列表
-					if (watchFile4Socket.mapTest(p.substring(rootPathLength), ignore)) {
-						console.warn('[WARN] '+p+' ignore');
-						return;
-					}
-
-					if (isFile) {
-						watchFile4Socket.addFile(client, p);
-					} else {
-						watchFile4Socket.addPath(client, p, rootPathLength, ignore);
-					}
-				});
-			})();
+			addPath(i);
 		}
 	});
 };
