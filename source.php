@@ -145,9 +145,7 @@ function fileContentTpl($file, $filepath = false) {
 
 
 		// LESS包含baseLess文件
-		if ($extension == 'less') {
-			includeLess($file, $content);
-		}
+		if ($extension == 'less') LessBuilder::doInclude($file, $content);
 	}
 
 

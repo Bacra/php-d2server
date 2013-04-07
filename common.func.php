@@ -55,53 +55,77 @@ function compressCss($inputFile, $outputFile){
 }
 
 
-function buildLess($lessFile, $cssFile){
-	// 处理文件中的$include的内容
-	$fileContent = @file_get_contents($lessFile);
-	$rs = includeLess($lessFile, $fileContent);
-	if ($rs) {
-		$tempLess = $cssFile.'.less';
-		@file_put_contents($tempLess, $fileContent);
-		$execCommand = LESSC.' "'.$tempLess.'" > "'.$cssFile.'"';
-	} else {
-		$execCommand = LESSC.' "'.$lessFile.'" > "'.$cssFile.'"';
-	}
-	
-	$execCommand = str_replace('/', "\\", $execCommand);
-	// echo $execCommand;
-	@exec($execCommand, $return, $code);
 
-	if ($code != 0) {
-		Console::error($return);
-		// Console::error("[ERROR] 合并文件中将不包含此文件内容");
-		// Console::error("	$lessFile");
+class LessBuilder{
 
-		return false;
-	}
-
-	return true;
-}
-
-
-// 注意：返回值不是$fileContent
-function includeLess($lessFile, &$fileContent){
-	$lessPath = dirname($lessFile).'/';
-	$edited = false;
-	static $baseFileContents = array();
-
-	$fileContent = preg_replace_callback('/\@include +(\'|")?(.*?)\1;/', function($matches) use(&$lessPath, &$baseFileContents, &$edited){
-		$path = $lessPath.$matches[2];
-		// echo $path;
-		if (!isset($baseFileContents[$path])) {
-			$baseFileContents[$path] = @file_get_contents($path);
+	static function build($lessFile, $cssFile){
+		// 处理文件中的$include的内容
+		$fileContent = @file_get_contents($lessFile);
+		$rs = self::doInclude($lessFile, $fileContent);
+		if ($rs) {
+			$tempLess = $cssFile.'.less';
+			@file_put_contents($tempLess, $fileContent);
+			$execCommand = LESSC.' "'.$tempLess.'" > "'.$cssFile.'"';
+		} else {
+			$execCommand = LESSC.' "'.$lessFile.'" > "'.$cssFile.'"';
 		}
-		$edited = true;
+		
+		$execCommand = str_replace('/', "\\", $execCommand);
+		// echo $execCommand;
+		@exec($execCommand, $return, $code);
 
-		return $baseFileContents[$path];
-	}, $fileContent);
+		if ($code != 0) {
+			Console::error($return);
+			// Console::error("[ERROR] 合并文件中将不包含此文件内容");
+			// Console::error("	$lessFile");
 
-	return $edited;
+			return false;
+		}
+
+		self::doBEM($cssFile);
+
+		return true;
+	}
+
+
+	// 注意：返回值不是$fileContent
+	static function doInclude($lessFile, &$fileContent){
+		$lessPath = dirname($lessFile).'/';
+		$edited = false;
+		static $baseFileContents = array();
+
+		$fileContent = preg_replace_callback('/\@include +(\'|")?(.*?)\1;/', function($matches) use(&$lessPath, &$baseFileContents, &$edited){
+			$edited = true;
+
+			$path = $lessPath.$matches[2];
+			if (!isset($baseFileContents[$path])) {
+				$baseFileContents[$path] = @file_get_contents($path);
+			}
+
+			return $baseFileContents[$path];
+		}, $fileContent);
+
+		return $edited;
+	}
+
+	// 将css文件中样式名字再一次进行处理，转化为BEM命名
+	static function doBEM($file){
+		$fileContent = file_get_contents($file);
+
+		$edited = false;
+		$fileContent = preg_replace_callback('/([\w\d_-]) +\.(--|__)/', function($matches) use(&$edited){
+			$edited = true;
+
+			return $matches[1].$matches[2];
+		}, $fileContent);
+
+		if ($edited) file_put_contents($file, $fileContent);
+	}
 }
+
+
+
+
 
 
 function buildCss($filePath, $fileContent){
@@ -185,17 +209,9 @@ function tempLess($inputFile, $outputFile){
 	static $arr = array();
 	$key = $inputFile.$outputFile;
 	if (!in_array($key, $arr)){
-		if (!buildLess($inputFile, $outputFile)) return false;
+		if (!LessBuilder::build($inputFile, $outputFile)) return false;
 		$arr[] = $key;
 	}
-
-	/* if (file_exists($outputFile) && @filemtime($outputFile) > @filemtime($inputFile)) {
-		showCmdMsg("[SKIP LESS] 文件已存在[最新] 跳过");
-		showCmdMsg("	$inputFile");
-	} else {
-		// 生成文件
-		return buildLess($inputFile, $outputFile);
-	} */
 
 	return true;
 }

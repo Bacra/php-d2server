@@ -3938,7 +3938,9 @@ less.unwatch = function () {clearInterval(less.watchTimer); return this.watchMod
 
 function initRunningMode(){
 	if (less.env === 'development') {		
-		less.optimization = 0;		
+		less.optimization = 0;
+
+        // @author wf		
 		/*less.watchTimer = setInterval(function () {			
 			if (less.watchMode) {
 				loadStyleSheets(function (e, root, _, sheet, env) {
@@ -3959,11 +3961,14 @@ function initRunningMode(){
             }
         };
 
+
+        
         if (window.addEventListener) {
             window.addEventListener('focus', less.watchFN);
         } else {
             window.attachEvent('focus', less.watchFN);
         }
+        // end
 	} else {
 		less.optimization = 3;
 	}
@@ -4218,6 +4223,10 @@ function extractId(href) {
 }
 
 function createCSS(styles, sheet, lastModified) {
+    // @author wf
+    styles = styles.replace(/([\w\d_-]) +\.(--|__)/g, '$1$2');
+    // end
+
     var css;
 
     // Strip the query-string
