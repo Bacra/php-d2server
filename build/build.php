@@ -110,6 +110,9 @@ foreach ($CONFIG['files'] AS $outputPath => $inputPaths) {
 
 
 
+
+
+
 // 输出信息
 $warnMsg = Console::getWarn();
 $errorMsg = Console::getError();
@@ -129,6 +132,9 @@ if ($warnMsgNum || $errorMsgNum) {
 
 
 // 使用到的函数
+
+// 文件同步类
+// 仅仅只同步通过build处理的文件，类似的图片及未包含在buildconfig作用范围内的文件，不同步
 class FileSyncher {
 	private $rules = array();
 	private $synchDir;

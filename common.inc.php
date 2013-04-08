@@ -25,6 +25,8 @@ define('DOMAINROOT', 'w:/');
 
 // 注意：相对的是域名根目录
 define('LESSFILE', '//www.test.com:3316/Less/myLess.js');
+define('EXTJSFILE', '//www.test.com:3316/ext.js');
+
 // 配置文件相对HTML根目录的相对路径
 // 修改此参数之后，注意修改build文件中的ROOT目录
 define('CONFIGPATH', '.source/.buildconfig');

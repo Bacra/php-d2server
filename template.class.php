@@ -4,33 +4,13 @@
  */
 class TemplateNodeBuilder {
 	protected $body = '';
-	private $omit = array();
+	private $omits = array();
+	private $omitNames = array();		// 保存该页面解析过程中，所有的omit名字；仅限该页面
+										// 注意：暂时未被使用
 
 	function __construct($str){
 		$doc = new DOMDocument();
 		DEBUG ? $doc->loadHTML($str) : @$doc->loadHTML($str);
-		
-		// 编码问题
-		/*$nodes = $doc -> getElementsByTagName('meta');
-		$i = 0;
-		$isCharSet = false;
-		while($node = $nodes -> item($i++)) {
-			if ($node -> hasAttribute('http-equiv') && $node -> hasAttribute('content') && preg_match('/charset=\w/i', $node -> getAttribute('content'))) {
-				$isCharSet = true;
-			}
-		}
-		if (!$isCharSet) {
-			if (!$doc -> getElementsByTagName('html') -> length) {
-				$doc -> insertBefore(new DOMElement('html'));
-			}
-			if (!$doc -> getElementsByTagName('head') -> length) {
-				$doc -> getElementsByTagName('html') -> item(0) -> insertBefore(new DOMElement('head'));
-			}
-			$elem = new DOMElement('meta');
-			$doc -> getElementsByTagName('head') -> item(0) -> insertBefore($elem);
-			$elem -> setAttribute('http-equiv', 'Content-Type');
-			$elem -> setAttribute('content', 'text/html; charset=utf-8');
-		}*/
 
 
 		$nodes = $doc -> getElementsByTagName('*');
@@ -89,11 +69,10 @@ class TemplateNodeBuilder {
 			}
 		}
 
-		// $this -> omit = $omits;
-		// var_dump($omits);
 
 		foreach ($omits AS $key => $val) {
-			$this -> omit[$key] = $val -> html();
+			$this -> omits[$key] = $val -> html();
+			$this -> omitNames[] = $key;
 		}
 		$this -> body = $doc->saveHTML();
 	}
@@ -105,10 +84,13 @@ class TemplateNodeBuilder {
 	}
 
 	public function getOmit($name){
-		return $this -> omit[$name];
+		return $this -> omits[$name];
 	}
 	public function hasOmit($name) {
-		return isset($this -> omit[$name]);
+		return isset($this -> omits[$name]);
+	}
+	public function getOmitNames(){
+		return $this -> omitNames;
 	}
 
 
@@ -287,7 +269,8 @@ class TemplateNode {
  * 将smart语法解析成可执行代码
  */
 class TemplateHTML {
-	public static $HTMLPartParam = 'HTMLPART';		// 定义$htmlpart变量的变量名（也可以是常量）
+	public static $HTMLPartParam = '$_OMIT';		// 定义$htmlpart变量的变量名
+														// 为支持批量导出，不要使用常量（不可修改是硬伤）
 	public static $HTMLDirParam = 'HTMLDIR';
 	public static $HTMLRedirParam = 'HTML_REDIR';
 	public static $HTMLRedirMarker = '[PATH]';
@@ -373,7 +356,7 @@ class TemplateHTML {
  * 解析模版，并缓存数据
  */
 class TemplateParser {
-	static private $cache4node = array();
+	static private $cache4node = array();		// 保存TemplateNodeFileBuilder对象，包含了DOM及其相应的htmlPart值
 	static private $cache4html = array();
 
 	static public function parse($file) {
@@ -473,7 +456,7 @@ function parseOmit($file, $omit){
 		if (!TemplateParser::hasHTML($tplFile)) {
 			if (!TemplateParser::hasNode($file)) {
 				// parseTemplate($file);
-				// 不能使用parseTemplate，必须强制去解析模版 否则会造成getNode函数抛错
+				// 不能使用parseTemplate(使用了缓存机制)，必须强制去解析模版 否则会造成getNode函数抛错
 				TemplateParser::parse($file);
 			}
 			$ob = TemplateParser::getNode($file);

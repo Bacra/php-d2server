@@ -40,15 +40,15 @@ switch($_GET('type')) {
 			echo json_encode(array('status'=>'HTML文件不存在'));
 			exit();
 		}
-		define('HTMLPART', isset($_GET['part']) ? $_GET['part'] : false);
-		if (HTMLPART) {
+		define('OMIT', isset($_GET['part']) ? $_GET['part'] : false);
+		if (OMIT) {
 			$content = file_get_contents(HTMLPATH);
-			$content = modelHTML($content, HTMLPART);
+			$content = modelHTML($content, OMIT);
 		} else {
 			$content = file_get_contents(HTMLPATH);
 		}
 
-		file_put_contents(HTMLPATH.$pathinfo['filename'].'-4-'.HTMLPART.'.'.$pathinfo['extension'], $content);
+		file_put_contents(HTMLPATH.$pathinfo['filename'].'-4-'.OMIT.'.'.$pathinfo['extension'], $content);
 }
 
 ?>

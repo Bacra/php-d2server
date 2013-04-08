@@ -113,7 +113,7 @@ class LessBuilder{
 		$fileContent = file_get_contents($file);
 
 		$edited = false;
-		$fileContent = preg_replace_callback('/([\w\d_-]) +\.(--|__)/', function($matches) use(&$edited){
+		$fileContent = preg_replace_callback('/([\w-]) +\.(--|__)/', function($matches) use(&$edited){
 			$edited = true;
 
 			return $matches[1].$matches[2];
@@ -398,4 +398,10 @@ function template($content, $path){
 }
 */
 
+
+
+function useTemplate($file, $_OMIT, $extParams = false){
+	if (!empty($extParams)) extract($extParams);
+	include $file;
+};
 ?>

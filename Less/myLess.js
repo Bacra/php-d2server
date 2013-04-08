@@ -4224,7 +4224,7 @@ function extractId(href) {
 
 function createCSS(styles, sheet, lastModified) {
     // @author wf
-    styles = styles.replace(/([\w\d_-]) +\.(--|__)/g, '$1$2');
+    styles = styles.replace(/([\w-]) +\.(--|__)/g, '$1$2');
     // end
 
     var css;
