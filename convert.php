@@ -48,11 +48,7 @@ if (file_exists(HTMLFILE)) {
 			// 调用最全面的缓存模版
 			useTemplate(CACHEHTMLFILE, OMIT);
 		} else if (MERGERSOURSE) {
-			if (OMIT) {
-				useTemplate(parseTemplate(HTMLFILE), OMIT);
-			} else {
-				echo file_get_contents(HTMLFILE);
-			}
+			useTemplate(parseTemplate(HTMLFILE), OMIT);
 		} else {
 			// 生成并创建HTML缓存
 			makeDirs(CACHEHTMLFILE);
