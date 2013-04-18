@@ -40,8 +40,6 @@ foreach ($CONFIG['files'] AS $outputPath => $inputPaths) {
 	foreach ($inputPaths AS $inputPath) {
 		$rs = getValidInputfiles($inputPath);
 		if (!$rs) {
-			Console::error("文件不存在 跳过");
-			Console::error("	$inputFile");
 			continue;
 		}
 		$str .= file_get_contents($rs)."\n\n";;
@@ -190,7 +188,11 @@ class FileSyncher {
 // 期间也会对less文件进行编译操作
 function getValidInputfiles($filepath) {
 	$inputFile = SOURCEDIR.$filepath;
-	if (!file_exists($inputFile)) return false;
+	if (!file_exists($inputFile)) {
+		Console::error("文件不存在 跳过");
+		Console::error("	$inputFile");
+		return false;
+	}
 
 	$pathinfo = pathinfo($filepath);
 	$type = $pathinfo['extension'];
@@ -203,6 +205,10 @@ function getValidInputfiles($filepath) {
 		// 判断文件是否存在 并且是最新的
 		// 如果不是最新的文件，生成文件
 		if (tempLess($inputFile, $outputFile)) return $outputFile;
+	} else if(preg_match('/\.test$/', $pathinfo['filename'])) {
+		Console::warn("跳过测试文件");
+		Console::warn("	$inputFile");
+		return false;
 	} else {
 		return $inputFile;
 	}
