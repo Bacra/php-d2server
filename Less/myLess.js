@@ -3952,13 +3952,14 @@ function initRunningMode(){
 		}, less.poll);*/
 
         less.watchFN = function(){
-            if (less.watchMode) {
-                loadStyleSheets(function (e, root, _, sheet, env) {
-                    if (root) {
-                        createCSS(root.toCSS(), sheet, env.lastModified);
-                    }
-                });
-            }
+            if (less.watchMode) less.reloadStyleSheets();
+        };
+        less.reloadStyleSheets = function(){
+            loadStyleSheets(function (e, root, _, sheet, env) {
+                if (root) {
+                    createCSS(root.toCSS(), sheet, env.lastModified);
+                }
+            });
         };
 
 

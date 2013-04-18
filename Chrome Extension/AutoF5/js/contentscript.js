@@ -72,7 +72,7 @@ var _WS_SetTimeout4less = false,
 						if (!_WS_SetTimeout4less) {
 							_WS_SetTimeout4less = true;
 							
-							insertScript('if (window.less) window.less.watchFN();');
+							insertScript('if (window.less) window.less.reloadStyleSheets();');
 
 							setTimeout(function(){
 								_WS_SetTimeout4less = false;

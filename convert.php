@@ -167,6 +167,7 @@ function replaceSource($content, $_CONFIG){
 
 
 function showExtJS($_CONFIG){
+	$jsCont = '';
 	// 插入附加JS
 	if (isset($_CONFIG['html'])) {
 		$pathinfo = pathinfo(HTMLFILE);
