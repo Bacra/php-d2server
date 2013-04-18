@@ -111,7 +111,7 @@ function replaceSource($content, $_CONFIG){
 					// 如果文件不存在，就不添加
 					// less如果文件不存在继续引入，会报错
 					if (!file_exists($inputFile)) {
-						$echoArr[] = "\n\n<!-- [Convert ERROR] $inputPath 文件丢失 无法引入 -->\n\n";
+						$echoArr[] = "\n\n<script> console.error('[Convert ERROR] $inputPath 文件丢失 无法引入') </script>\n\n";
 						continue;
 					}
 
