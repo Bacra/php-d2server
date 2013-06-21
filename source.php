@@ -1,14 +1,13 @@
 <?php
-require dirname(__FILE__).'/common.inc.php';
+require 'common.inc.php';
 
-// require './common.inc.php';
 
 // 获取文件类型 并设置编码
 $charset = isset($_GET['charset']) ? strtolower($_GET['charset']) : 'utf-8';
 
 // 设置数据类型
-$pathinfo = pathinfo($_SERVER["REDIRECT_URL"]);
-$extension = isset($_GET['extension']) ? $_GET['extension'] : $pathinfo['extension'];
+$extension = isset($_GET['extension']) ? $_GET['extension'] : 'js';
+
 switch ($extension) {
 	case 'js':
 		$type = 'text/javascript';
@@ -31,9 +30,7 @@ switch ($extension) {
 header("Content-Type:$type;charset=$charset");
 
 
-
-
-define('HTMLPATH', isset($_COOKIE[COOKIENAME4HTMLPATH]) ? $_COOKIE[COOKIENAME4HTMLPATH] : DOMAINROOT);
+define('HTMLPATH', isset($_COOKIE[COOKIENAME4HTMLDIR]) ? $_COOKIE[COOKIENAME4HTMLDIR] : DOMAINROOT);
 define('PARAMFILE', HTMLPATH.PARAMPATH);
 
 
@@ -62,25 +59,7 @@ if (file_exists(PARAMFILE)) {
 		$filePathArr = array();
 		$fileContent = '';
 		$errorFileArr = array();
-
-		if (is_array($dealFiles)) {
-			foreach ($dealFiles AS $file) {
-				loadFile($file, $fileContent, $filePathArr, $errorFileArr, true);
-			}
-
-			// 输出头部信息
-			echo "/**********************************\n\n".
-				"	Now: ".date('l dS \of F Y h:i:s A', time())."\n";
-
-			if (count($filePathArr) > 0) {
-				echo "\n	[Success FilePath]\n".
-					"	".implode("\n	", $filePathArr)."\n";
-			}
-
-			echo "\n**********************************/\n";
-		} else {
-			loadFile($dealFiles, $fileContent, $filePathArr, $errorFileArr, false);
-		}
+		loadFile($dealFiles, $fileContent, $filePathArr, $errorFileArr, false);
 
 		if (count($errorFileArr) > 0) {
 			echo "/**********************************\n\n";
@@ -101,7 +80,7 @@ if (file_exists(PARAMFILE)) {
 } else {
 	echo "/**********************************\n".
 		"PARAMFILE 文件不存在\n".
-		"COOKIE：".(isset($_COOKIE[COOKIENAME4HTMLPATH]) ? $_COOKIE[COOKIENAME4HTMLPATH] : 'undefined')."\n".
+		"COOKIE：".(isset($_COOKIE[COOKIENAME4HTMLDIR]) ? $_COOKIE[COOKIENAME4HTMLDIR] : 'undefined')."\n".
 		"**********************************/\n";
 }
 
@@ -166,9 +145,7 @@ function fileContentTpl($file, $filepath = false) {
 
 
 		// LESS包含baseLess文件
-		if ($extension == 'less') {
-			includeLess($file, $content);
-		}
+		if ($extension == 'less') LessBuilder::doInclude($file, $content);
 	}
 
 

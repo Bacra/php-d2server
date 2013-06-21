@@ -1,0 +1,31 @@
+{
+	"name": "AutoF5",
+	"version": "1.0",
+	"description": "Support for WebProject Environment",
+	"background": { "scripts": ["js/background.js"] },
+	"page_action" : {
+		"default_icon" : "icon/icon-19.png",
+		"default_title" : "show setting for website"
+	},
+	"permissions" : [
+		"tabs",
+		"http://*/*",
+		"https://*/*",
+		"notifications"
+	],
+	"icons" : {
+		"19": "icon/icon-19.png",
+		"48" : "icon/icon-48.png",
+		"128" : "icon/icon-128.png"
+	},
+	"content_scripts" : [
+		{
+			"matches" : [
+				"*://www.test.com/*"
+			],
+			"js" : ["js/contentscript.js"],
+			"all_frames" : true
+		}
+	],
+	"manifest_version": 2
+}
