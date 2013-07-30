@@ -1,3 +1,13 @@
+## NOTE
+
+**基于NodeJS的D2Server已经发布，请关注[node-d2server](https://github.com/Bacra/node-d2server)这个项目**
+
+由于[环境配置](./common.inc.php)较为复杂，需要分布配置Apache、Chrome、Fiddler2，运行的时候，需要同时启动Apache和Node App， **项目已经停止更新**
+
+爱折腾的朋友可以继续[Fork](https://github.com/Bacra/php-d2server/fork)，至今依然喜欢这个模版引擎的（完全面向前端）
+
+
+
 PHP-D2Server
 ============
 
@@ -5,16 +15,6 @@ PHP-D2Server
 
 PS：这是用PHP编写的D2Server版本，你可能在寻找[node版本](https://github.com/Bacra/node-d2server)
 
-
-
-
-## NOTE
-
-由于[环境配置](./common.inc.php)较为复杂，需要分布配置Apache、Chrome、Fiddler2，运行的时候，需要同时启动Apache和Node App， **项目已经停止更新**
-
-爱折腾的朋友可以继续[Fork](https://github.com/Bacra/php-d2server/fork)，至今依然喜欢这个模版引擎的（完全面向前端）
-
-基于NodeJS的D2Server已经发布，请关注[node-d2server](https://github.com/Bacra/node-d2server)这个项目
 
 
 
@@ -31,6 +31,7 @@ PS：这是用PHP编写的D2Server版本，你可能在寻找[node版本](https:
 9. 进入[build文件夹](./build)文件夹，运行`安装.bat`
 10. 安装全局的基于NodeJS的LESSC
 11. 运行Apache和NodeJS文件夹下的`server.js`
+
 
 
 
