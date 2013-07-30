@@ -1,0 +1,30 @@
+<?php
+// 注意：无论如何LESS都会慢于CSS文件的渲染
+// LESS文件必须位于head内
+return array(
+	'html' => array(
+		'app' => array(
+			'wf_mApp4QuesList' => 'app-提问模块',
+			'wf_mApp4ZX' => 'app-咨询类'
+		)
+	),
+	'files' => array(
+		'css/wf_base.css' => array(
+			'base.css',
+		),
+		'css/wf_mainInput.min.css' => array(
+			'myBase/base.css',
+			'wf_8684-1.1.min.css',
+			'MainInput/wf_mainInput.less'
+		),
+		'js/wf_mainInput.ext.js' => array(
+			'myBase/base.ext.js',
+			'MainInput/wf_mainInput.ext.js'
+		),
+		'js/wf_mainInput.min.js' => array(
+			'myBase/base.js',
+			'MainInput/wf_mainInput.js'
+		)
+	)
+);
+?>
